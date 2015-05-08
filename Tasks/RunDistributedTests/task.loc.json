@@ -9,15 +9,13 @@
   "category": "Test",
   "visibility": [
     "Preview",
-    "Build",
-    "Release"
+    "Build"
   ],
   "author": "Microsoft Corporation",
   "version": {
     "Major": 1,
     "Minor": 0,
-    "Patch": 1,
-    "IsTest": false
+    "Patch": 1
   },
   "demands": [],
   "groups": [
@@ -40,7 +38,7 @@
   "inputs": [
     {
       "name": "environment",
-      "type": "string",
+      "type": "pickList",
       "label": "ms-resource:loc.input.label.environment",
       "defaultValue": "",
       "required": true,
@@ -75,6 +73,22 @@
       "groupName": "testSettings"
     },
     {
+      "name": "platform",
+      "type": "string",
+      "label": "ms-resource:loc.input.label.platform",
+      "defaultValue": "",
+      "required": false,
+      "groupName": "testSettings"
+    },
+    {
+      "name": "configuration",
+      "type": "string",
+      "label": "ms-resource:loc.input.label.configuration",
+      "defaultValue": "",
+      "required": false,
+      "groupName": "testSettings"
+    },
+    {
       "name": "runSettingsFile",
       "type": "string",
       "label": "ms-resource:loc.input.label.runSettingsFile",
@@ -102,6 +116,15 @@
       "groupName": "testSettings"
     },
     {
+      "name": "testConfigurations",
+      "type": "string",
+      "label": "ms-resource:loc.input.label.testConfigurations",
+      "defaultValue": "",
+      "required": false,
+      "helpMarkDown": "Optionally associate a testcase filter against a testconfiguration id. Syntax: &lt;Filter1&gt;:&lt;Id1&gt;;DefaultTestConfiguration:&lt;Id3&gt;. For example: FullyQualifiedName~Chrome:12.",
+      "groupName": "testSettings"
+    },
+    {
       "name": "autEnvironmentName",
       "type": "string",
       "label": "ms-resource:loc.input.label.autEnvironmentName",
@@ -109,6 +132,14 @@
       "required": false,
       "helpMarkDown": "The name of the application under test(AUT) machine group on which server processes such as W3WP.exe is running.",
       "groupName": "advanced"
+    }
+  ],
+  "sourceDefinitions": [
+    {
+      "target": "environment",
+      "endpoint": "/$(system.teamProject)/_apis/vslabs/environments",
+      "selector": "jsonpath:$.value[*].name",
+      "authKey": "tfs:DevTestLabs"
     }
   ],
   "instanceNameFormat": "Test assemblies $(sourcefilters)",
