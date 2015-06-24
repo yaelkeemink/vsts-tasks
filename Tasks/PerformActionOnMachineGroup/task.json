@@ -3,7 +3,7 @@
     "name": "PerformActionOnMachineGroup",
     "friendlyName": "Machine Group Actions",
     "description": "Machine Group Actions",
-    "helpMarkDown": "Perform actions like start, stop, delete on a machine group",
+    "helpMarkDown": "Perform actions like start, stop, delete etc. on a machine group",
     "category": "Deploy",
     "visibility": [
                 "Preview",
@@ -23,7 +23,7 @@
             "label": "Azure Subscription",
             "defaultValue": "",
             "required": false,
-            "helpMarkDown": "Azure Subscription under which the Resource Group is deployed and optional for pre-existing machine group."
+            "helpMarkDown": "Azure Subscription where the Resource Group is deployed. Optional for a pre-existing machine group."
         },
         {
             "name": "MachineGroupName", 
