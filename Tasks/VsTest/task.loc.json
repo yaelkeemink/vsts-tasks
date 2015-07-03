@@ -88,6 +88,15 @@
       "groupName": "advanced"
     },
     {
+      "name": "distributeTests",
+      "type": "boolean",
+      "label": "ms-resource:loc.input.label.distributeTests",
+      "defaultValue": "False",
+      "required": false,
+      "helpMarkDown": "ms-resource:loc.input.help.distributeTests",
+      "groupName": "advanced"
+    },
+    {
       "name": "vsTestVersion",
       "type": "pickList",
       "label": "ms-resource:loc.input.label.vsTestVersion",

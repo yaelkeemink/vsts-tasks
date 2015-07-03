@@ -83,6 +83,15 @@
       "required": false,
       "helpMarkDown": "Whether code coverage needs to be enabled.",
       "groupName":"advanced"
+    }, 
+     {
+      "name": "distributeTests",
+      "type": "boolean",
+      "label": "Distribte tests",
+      "defaultValue": "False",
+      "required": false,
+      "helpMarkDown": "Whether tests need to be distributed.",
+      "groupName":"advanced"
     },    
     {
       "name": "vsTestVersion",
