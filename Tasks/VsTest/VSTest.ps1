@@ -40,7 +40,7 @@ else
 }
 
 $codeCoverage = Convert-String $codeCoverageEnabled Boolean
-
+$distributeTestsenabled = Convert-String $distributeTests Boolean
 if($testAssemblyFiles)
 {
     Write-Verbose -Verbose "Calling Invoke-VSTest for all test assemblies"
@@ -59,7 +59,7 @@ if($testAssemblyFiles)
     Write-Verbose "Getting the connection object"
     $connection = Get-VssConnection -TaskContext $distributedTaskContext
 
-    Invoke-VSTest -TestAssemblies $testAssemblyFiles -VSTestVersion $vsTestVersion -TestFiltercriteria $testFiltercriteria -RunSettingsFile $runSettingsFile -PathtoCustomTestAdapters $pathtoCustomTestAdapters -CodeCoverageEnabled $codeCoverage -OverrideTestrunParameters $overrideTestrunParameters -OtherConsoleOptions $otherConsoleOptions -WorkingFolder $workingDirectory -TestResultsFolder $testResultsDirectory -Connection $connection
+    Invoke-VSTest -TestAssemblies $testAssemblyFiles -VSTestVersion $vsTestVersion -TestFiltercriteria $testFiltercriteria -RunSettingsFile $runSettingsFile -PathtoCustomTestAdapters $pathtoCustomTestAdapters -CodeCoverageEnabled $codeCoverage -OverrideTestrunParameters $overrideTestrunParameters -OtherConsoleOptions $otherConsoleOptions -WorkingFolder $workingDirectory -TestResultsFolder $testResultsDirectory -DistributeTests $distributeTestsenabled -Connection $connection 
 
     $resultFiles = Find-Files -SearchPattern "*.trx" -RootFolder $testResultsDirectory 
 
@@ -69,7 +69,10 @@ if($testAssemblyFiles)
     }
     else
     {
-        Write-Warning "No results found to publish."
+        if(-not $distributeTestsenabled)
+        {
+           Write-Warning "No results found to publish."
+        }
     }
 }
 else
