@@ -58,6 +58,22 @@ function Restart-MachineInProvider
     Write-Host (Get-LocalizedString -Key "[Azure Resource Manager]Restarted machine '{0}' from Azure provider" -ArgumentList $machineName)
 }
 
+function Unblock-MachineGroup
+{
+    param([string]$machineGroupName)
+
+    throw (Get-LocalizedString -Key "Unblock operation is not supported on the machine groups on Azure Provider")
+}
+
+function Block-MachineGroup
+{
+    param([string]$machineGroupName,
+          [string]$blockedFor,
+          [string]$timeInHours)
+
+    throw (Get-LocalizedString -Key "Block operation is not supported on the machine groups on Azure Provider")
+}
+
 function Initialize-AzureHelper
 {
     Write-Verbose "Initializing azure resource provider" -Verbose

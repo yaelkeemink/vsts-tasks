@@ -28,7 +28,14 @@ $ErrorActionPreference = "Stop"
 . ./Helper.ps1
 Initialize-DTLServiceHelper
 
+if ($Action -eq "Block")
+{
+    Set-TaskVariable -Variable "DTL_RESERVATION_CONTEXT" -Value $BlockedFor
+    Write-Verbose -Verbose "Task variable DTL_RESERVATION_CONTEXT set with the value $BlockedFor"
+}
+
 $machineGroup = Get-MachineGroup -machineGroupName $MachineGroupName -filters $Filters
+ Write-Verbose -Verbose "Machine Group: $machineGroup"
 
 # if providerName is null or empty then follow same path as standard environment.
 if($machineGroup.Provider -eq $null)
@@ -39,6 +46,7 @@ else
 {
 	$providerName = $machineGroup.Provider.Name
 }
+
 Write-Verbose -Verbose "ProviderName = $providerName"
 
 # Loads the required file based on the provider , so that functions in that provider are called.
