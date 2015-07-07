@@ -92,6 +92,24 @@
       "required": false,
       "helpMarkDown": "Whether tests need to be distributed.",
       "groupName":"advanced"
+    },  
+     {
+      "name": "testPool",
+      "type": "string",
+      "label": "Test pool",
+      "defaultValue": "",
+      "required": false,
+      "helpMarkDown": "Test pool name",
+      "groupName":"advanced"
+    }, 
+     {
+      "name": "artifactBuildId",
+      "type": "string",
+      "label": "Build id",
+      "defaultValue": "",
+      "required": false,
+      "helpMarkDown": "Build Id of the artifact to download from.",
+      "groupName":"advanced"
     },    
     {
       "name": "vsTestVersion",
