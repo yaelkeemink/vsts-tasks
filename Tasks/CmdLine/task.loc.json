@@ -16,7 +16,7 @@
   "version": {
     "Major": 1,
     "Minor": 0,
-    "Patch": 8
+    "Patch": 11
   },
   "groups": [
     {
@@ -54,7 +54,7 @@
       "name": "failOnStandardError",
       "type": "boolean",
       "label": "ms-resource:loc.input.label.failOnStandardError",
-      "defaultValue": "true",
+      "defaultValue": "false",
       "required": false,
       "helpMarkDown": "ms-resource:loc.input.help.failOnStandardError",
       "groupName": "advanced"

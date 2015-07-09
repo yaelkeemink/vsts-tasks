@@ -1,9 +1,9 @@
-﻿{
+{
     "id": "3B5693D4-5777-4FEE-862A-BD2B7A374C68",
     "name": "PowerShellOnTargetMachines",
     "friendlyName": "PowerShell on Target Machines",
     "description": "Execute PowerShell scripts on remote machine(s)",
-    "helpMarkDown": "Execute PowerShell scripts on remote machine(s)",
+    "helpMarkDown": "[More Information](https://github.com/Microsoft/vso-agent-tasks/blob/master/Tasks/PowerShellOnTargetMachines/README.md)",
     "category": "Deploy",
     "visibility": [
                 "Build",
@@ -13,9 +13,9 @@
     "version": {
         "Major": 1,
         "Minor": 0,
-        "Patch": 2
+        "Patch": 4
     },
-    "minimumAgentVersion": "1.83.0",
+    "minimumAgentVersion": "1.85.0",
     "groups": [
         {
             "name":"advanced",
@@ -30,7 +30,18 @@
             "label": "Machine Group",
             "defaultValue": "",
             "required": true,
-            "helpMarkDown": "Name of the Machine Group for deploying application.​"
+            "helpMarkDown": "Name of the Machine Group for deploying application."
+        },
+        {
+            "name":"ResourceFilteringMethod",
+            "type":"radio",
+            "label":"Select Machines By",
+            "required":false,
+            "defaultValue":"machineNames",
+            "options": {
+                "machineNames":"Machine Names",
+                "tags":"Tags"
+            }
         },
         {
             "name": "MachineNames",
@@ -46,7 +57,7 @@
             "label": "PowerShell Script",
             "defaultValue": "",
             "required": true,
-            "helpMarkDown": "Location of the PowerShell script on the target machines or on a UNC path like c:\\BudgetIT\\Web\\Deploy\\Website.ps1"
+            "helpMarkDown": "Location of the PowerShell script on the target machines or on a UNC path like C:\\BudgetIT\\Web\\Deploy\\Website.ps1"
         },
         {
             "name": "ScriptArguments",
@@ -62,7 +73,7 @@
             "label": "Initialization Script",
             "defaultValue": "",
             "required": false,
-            "helpMarkDown": "Location of the data script for DSC on the target machines or on a UNC path like c:\\BudgetIT\\Web\\Deploy\\WebsiteConfiguration.ps1"
+            "helpMarkDown": "Location of the data script for DSC on the target machines or on a UNC path like C:\\BudgetIT\\Web\\Deploy\\WebsiteConfiguration.ps1"
         },
         {
             "name": "RunPowershellInParallel",
@@ -72,6 +83,15 @@
             "required": false,
             "groupName":"advanced",
             "helpMarkDown": "Setting it to true will run powershell scripts in parallel on the target machines."
+        },
+	    {
+            "name": "SessionVariables",
+            "type": "multiLine",
+            "label": "Session Variables",
+            "defaultValue": "",
+            "required": false,
+	        "groupName":"advanced",
+            "helpMarkDown": "Set common session variables for both the scripts. For example, $variable = value, $var1 = \"value, 123\""
         }
     ],
     "sourceDefinitions": [ 

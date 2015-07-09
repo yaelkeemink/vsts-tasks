@@ -1,9 +1,11 @@
 param(
+    [string][Parameter(Mandatory=$false)]$ConnectedServiceName,
     [string][Parameter(Mandatory=$true)]$MachineGroupName,
     [string][Parameter(Mandatory=$true)]$Action,
     [string][Parameter(Mandatory=$false)]$Filters,
     [string][Parameter(Mandatory=$false)]$BlockedFor,
-    [string][Parameter(Mandatory=$false)]$TimeInHours
+    [string][Parameter(Mandatory=$false)]$TimeInHours,
+    [string][Parameter(Mandatory=$false)]$WaitTimeInMinutes
 )
 
 Write-Verbose -Verbose "Beginning action on Machine Group"
@@ -14,6 +16,7 @@ Write-Verbose -Verbose "Action = $Action"
 Write-Verbose -Verbose "Filters = $Filters"
 Write-Verbose -Verbose "BlockedFor = $BlockedFor"
 Write-Verbose -Verbose "TimeInHours = $TimeInHours"
+Write-Verbose -Verbose "WaitTimeInMinutes = $WaitTimeInMinutes"
 
 import-module Microsoft.TeamFoundation.DistributedTask.Task.DevTestLabs
 import-module Microsoft.TeamFoundation.DistributedTask.Task.Internal
@@ -27,7 +30,15 @@ Initialize-DTLServiceHelper
 
 $machineGroup = Get-MachineGroup -machineGroupName $MachineGroupName -filters $Filters
 
-$providerName = $machineGroup.Provider.Name
+# if providerName is null or empty then follow same path as standard environment.
+if($machineGroup.Provider -eq $null)
+{
+    $providerName = "Pre-existing machines"
+}
+else
+{
+	$providerName = $machineGroup.Provider.Name
+}
 Write-Verbose -Verbose "ProviderName = $providerName"
 
 # Loads the required file based on the provider , so that functions in that provider are called.
