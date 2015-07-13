@@ -88,6 +88,42 @@
       "groupName": "advanced"
     },
     {
+      "name": "distributeTests",
+      "type": "boolean",
+      "label": "ms-resource:loc.input.label.distributeTests",
+      "defaultValue": "False",
+      "required": false,
+      "helpMarkDown": "ms-resource:loc.input.help.distributeTests",
+      "groupName": "advanced"
+    },
+    {
+      "name": "testPool",
+      "type": "string",
+      "label": "ms-resource:loc.input.label.testPool",
+      "defaultValue": "",
+      "required": false,
+      "helpMarkDown": "ms-resource:loc.input.help.testPool",
+      "groupName": "advanced"
+    },
+    {
+      "name": "artifactBuildId",
+      "type": "string",
+      "label": "ms-resource:loc.input.label.artifactBuildId",
+      "defaultValue": "",
+      "required": false,
+      "helpMarkDown": "ms-resource:loc.input.help.artifactBuildId",
+      "groupName": "advanced"
+    },
+    {
+      "name": "runId",
+      "type": "string",
+      "label": "ms-resource:loc.input.label.runId",
+      "defaultValue": "",
+      "required": false,
+      "helpMarkDown": "ms-resource:loc.input.help.runId",
+      "groupName": "advanced"
+    },
+    {
       "name": "vsTestVersion",
       "type": "pickList",
       "label": "ms-resource:loc.input.label.vsTestVersion",

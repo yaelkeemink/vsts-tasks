@@ -8,7 +8,11 @@ param(
     [string]$overrideTestrunParameters,
     [string]$otherConsoleOptions,
     [string]$platform,
-    [string]$configuration
+    [string]$configuration,
+    [string]$distributeTests,
+    [string]$artifactBuildId,
+    [string]$testPool,
+    [string]$runId
 )
 
 Write-Verbose "Entering script VSTestConsole.ps1"
@@ -19,12 +23,12 @@ import-module "Microsoft.TeamFoundation.DistributedTask.Task.Common"
 # Import the Task.TestResults dll that has the cmdlet we need for publishing results
 import-module "Microsoft.TeamFoundation.DistributedTask.Task.TestResults"
 
+
+
 if (!$testAssembly)
 {
     throw (Get-LocalizedString -Key "Test assembly parameter not set on script")
 }
-
-# check for solution pattern
 if ($testAssembly.Contains("*") -or $testAssembly.Contains("?"))
 {
     Write-Verbose "Pattern found in solution parameter. Calling Find-Files."
@@ -34,11 +38,13 @@ if ($testAssembly.Contains("*") -or $testAssembly.Contains("?"))
 }
 else
 {
+    
     Write-Verbose "No Pattern found in solution parameter."
     $testAssemblyFiles = ,$testAssembly
 }
 
 $codeCoverage = Convert-String $codeCoverageEnabled Boolean
+$distributeTestsenabled = Convert-String $distributeTests Boolean
 
 if($testAssemblyFiles)
 {
@@ -54,18 +60,24 @@ if($testAssemblyFiles)
 
     $workingDirectory = $artifactsDirectory
     $testResultsDirectory = $workingDirectory + "\" + "TestResults"
-    
-    Invoke-VSTest -TestAssemblies $testAssemblyFiles -VSTestVersion $vsTestVersion -TestFiltercriteria $testFiltercriteria -RunSettingsFile $runSettingsFile -PathtoCustomTestAdapters $pathtoCustomTestAdapters -CodeCoverageEnabled $codeCoverage -OverrideTestrunParameters $overrideTestrunParameters -OtherConsoleOptions $otherConsoleOptions -WorkingFolder $workingDirectory -TestResultsFolder $testResultsDirectory
+
+    Write-Verbose "Getting the connection object"
+    $connection = Get-VssConnection -TaskContext $distributedTaskContext
+    Write-Warning $artifactBuildId
+    Invoke-VSTest -TestAssemblies $testAssemblyFiles -VSTestVersion $vsTestVersion -TestFiltercriteria $testFiltercriteria -RunSettingsFile $runSettingsFile -PathtoCustomTestAdapters $pathtoCustomTestAdapters -CodeCoverageEnabled $codeCoverage -OverrideTestrunParameters $overrideTestrunParameters -OtherConsoleOptions $otherConsoleOptions -WorkingFolder $workingDirectory -TestResultsFolder $testResultsDirectory -DistributeTests $distributeTestsenabled -Connection $connection -ArtifactBuild $artifactBuildId -TestPool $testPool -RunId $runId
 
     $resultFiles = Find-Files -SearchPattern "*.trx" -RootFolder $testResultsDirectory 
 
     if($resultFiles) 
     {
-        Publish-TestResults -Context $distributedTaskContext -TestResultsFiles $resultFiles -TestRunner "VSTest" -Platform $platform -Configuration $configuration
+        Publish-TestResults -Context $distributedTaskContext -TestResultsFiles $resultFiles -TestRunner "VSTest" -Platform $platform -Configuration $configuration -RunId $runId
     }
     else
     {
-        Write-Warning "No results found to publish."
+        if(-not $distributeTestsenabled)
+        {
+           Write-Warning "No results found to publish."
+        }
     }
 }
 else

@@ -83,7 +83,43 @@
       "required": false,
       "helpMarkDown": "Whether code coverage needs to be enabled.",
       "groupName":"advanced"
-    },    
+    }, 
+     {
+      "name": "distributeTests",
+      "type": "boolean",
+      "label": "Distribte tests",
+      "defaultValue": "False",
+      "required": false,
+      "helpMarkDown": "Whether tests need to be distributed.",
+      "groupName":"advanced"
+    },  
+     {
+      "name": "testPool",
+      "type": "string",
+      "label": "Test pool",
+      "defaultValue": "",
+      "required": false,
+      "helpMarkDown": "Test pool name",
+      "groupName":"advanced"
+    }, 
+     {
+      "name": "artifactBuildId",
+      "type": "string",
+      "label": "Build id",
+      "defaultValue": "",
+      "required": false,
+      "helpMarkDown": "Build Id of the artifact to download from.",
+      "groupName":"advanced"
+    },
+     {
+      "name": "runId",
+      "type": "string",
+      "label": "Run id",
+      "defaultValue": "",
+      "required": false,
+      "helpMarkDown": "run id to publish",
+      "groupName":"advanced"
+    },     
     {
       "name": "vsTestVersion",
       "type": "pickList",
