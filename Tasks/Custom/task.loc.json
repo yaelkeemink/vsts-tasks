@@ -1,0 +1,155 @@
+// *******************************************************
+// GENERATED FILE - DO NOT EDIT DIRECTLY
+// *******************************************************
+{
+  "id": "643c781b-4ae1-47f6-abe4-d3d81ba56c72",
+  "name": "Custom",
+  "friendlyName": "ms-resource:loc.friendlyName",
+  "description": "ms-resource:loc.description",
+  "helpMarkDown": "ms-resource:loc.helpMarkDown",
+  "category": "Utility",
+  "visibility": [
+    "Build",
+    "Release"
+  ],
+  "author": "Microsoft Corporation",
+  "version": {
+    "Major": 1,
+    "Minor": 0,
+    "Patch": 12
+  },
+  "groups": [
+    {
+      "name": "group1",
+      "displayName": "ms-resource:loc.group.displayName.group1",
+      "isExpanded": false
+    },
+    {
+      "name": "group2",
+      "displayName": "ms-resource:loc.group.displayName.group2",
+      "isExpanded": true
+    }
+  ],
+  "inputs": [
+    {
+      "name": "stringType",
+      "type": "string",
+      "label": "ms-resource:loc.input.label.stringType",
+      "defaultValue": "",
+      "required": true,
+      "helpMarkDown": "ms-resource:loc.input.help.stringType"
+    },
+    {
+      "name": "multiLineType",
+      "type": "multiLine",
+      "label": "ms-resource:loc.input.label.multiLineType",
+      "defaultValue": "",
+      "required": true,
+      "helpMarkDown": "ms-resource:loc.input.help.multiLineType",
+      "visibleRule": "stringType != yash"
+    },
+    {
+      "name": "stringListType",
+      "type": "stringList",
+      "label": "ms-resource:loc.input.label.stringListType",
+      "defaultValue": "",
+      "required": true,
+      "helpMarkDown": "ms-resource:loc.input.help.stringListType"
+    },
+    {
+      "name": "radioType",
+      "type": "radio",
+      "label": "ms-resource:loc.input.label.radioType",
+      "required": false,
+      "defaultValue": "machineNames",
+      "options": {
+        "machineNames": "Machine Names",
+        "tags": "Tags"
+      },
+      "visibleRule": "",
+      "groupName": "group1"
+    },
+    {
+      "name": "filePathType",
+      "type": "filePath",
+      "label": "ms-resource:loc.input.label.filePathType",
+      "defaultValue": "",
+      "required": false,
+      "groupName": "group1"
+    },
+    {
+      "name": "booleanType",
+      "type": "boolean",
+      "label": "ms-resource:loc.input.label.booleanType",
+      "defaultValue": "false",
+      "required": false,
+      "helpMarkDown": "ms-resource:loc.input.help.booleanType",
+      "groupName": "group1"
+    },
+    {
+      "name": "pickListType",
+      "type": "pickList",
+      "label": "ms-resource:loc.input.label.pickListType",
+      "defaultValue": "default",
+      "required": true,
+      "helpMarkDown": "ms-resource:loc.input.help.pickListType",
+      "options": {
+        "default": "default",
+        "1.8": "JDK 8",
+        "1.7": "JDK 7",
+        "1.6": "JDK 6"
+      },
+      "groupName": "group1"
+    },
+    {
+      "name": "connectedServiceAzure",
+      "type": "connectedService:Azure",
+      "label": "ms-resource:loc.input.label.connectedServiceAzure",
+      "defaultValue": "",
+      "required": true,
+      "helpMarkDown": "ms-resource:loc.input.help.connectedServiceAzure",
+      "groupName": "group2"
+    },
+    {
+      "name": "connectedServiceChef",
+      "type": "connectedService:Chef",
+      "label": "ms-resource:loc.input.label.connectedServiceChef",
+      "defaultValue": "",
+      "required": true,
+      "helpMarkDown": "ms-resource:loc.input.help.connectedServiceChef",
+      "groupName": "group2"
+    },
+    {
+      "name": "connectedServiceGeneric",
+      "type": "connectedService:Generic",
+      "label": "ms-resource:loc.input.label.connectedServiceGeneric",
+      "defaultValue": "",
+      "required": true,
+      "helpMarkDown": "ms-resource:loc.input.help.connectedServiceGeneric",
+      "groupName": "group2"
+    },
+    {
+      "name": "azureConnectionType",
+      "type": "azureConnection",
+      "label": "ms-resource:loc.input.label.azureConnectionType",
+      "defaultValue": "",
+      "required": true,
+      "helpMarkDown": "ms-resource:loc.input.help.azureConnectionType",
+      "visibleRule": "connectedServiceAzure == yash",
+      "groupName": "group2"
+    }
+  ],
+  "instanceNameFormat": "ms-resource:loc.instanceNameFormat",
+  "execution": {
+    "Process": {
+      "target": "$(filename)",
+      "argumentFormat": "$(arguments)",
+      "workingDirectory": "$(workingFolder)",
+      "failOnStandardError": "$(failOnStandardError)"
+    },
+    "Node": {
+      "target": "cmdLine2.js",
+      "argumentFormat": ""
+    }
+  }
+}

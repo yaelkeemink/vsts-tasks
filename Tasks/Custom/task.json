@@ -1,0 +1,152 @@
+﻿{
+    "id": "643c781b-4ae1-47f6-abe4-d3d81ba56c72",
+    "name": "Custom",
+    "friendlyName": "Custom",
+    "description": "custom custom",
+    "helpMarkDown": "[More Information](http://go.microsoft.com/fwlink/?LinkID=613735)",
+    "category": "Utility",
+    "visibility": [
+                  "Build",
+                  "Release"
+                  ],    
+    "author": "Microsoft Corporation",
+    "version": {
+        "Major": 1,
+        "Minor": 0,
+        "Patch": 12
+    },
+    "groups": [
+    {
+      "name": "group1",
+      "displayName": "Group1",
+      "isExpanded": false
+    },
+    {
+      "name": "group2",
+      "displayName": "Group2",
+      "isExpanded": true
+    }
+    ],
+    "inputs": [
+        { 
+            "name": "stringType", 
+            "type": "string", 
+            "label": "String Type", 
+            "defaultValue": "", 
+            "required": true,
+            "helpMarkDown": "Tool name to run.  Tool should be found in your path.  Optionally, a fully qualified path can be supplied but that relies on that being present on the agent.<br/> Note: You can use **$(agent.builddirectory)**\\\\... if you want the path relative to repo."
+        },  
+        { 
+            "name": "multiLineType", 
+            "type": "multiLine", 
+            "label": "Multiline Type", 
+            "defaultValue": "", 
+            "required": true,
+            "helpMarkDown": "Tool name to run.  Tool should be found in your path.  Optionally, a fully qualified path can be supplied but that relies on that being present on the agent.<br/> Note: You can use **$(agent.builddirectory)**\\\\... if you want the path relative to repo.",
+            "visibleRule": "stringType != yash"
+        },  
+        { 
+            "name": "stringListType", 
+            "type": "stringList", 
+            "label": "String List Type", 
+            "defaultValue": "", 
+            "required": true,
+            "helpMarkDown": "Tool name to run.  Tool should be found in your path.  Optionally, a fully qualified path can be supplied but that relies on that being present on the agent.<br/> Note: You can use **$(agent.builddirectory)**\\\\... if you want the path relative to repo."
+        },  
+        {
+            "name":"radioType",
+            "type":"radio",
+            "label":"Radio Type",
+            "required":false,
+            "defaultValue":"machineNames",
+            "options": {
+                "machineNames":"Machine Names",
+                "tags":"Tags"
+            },
+            "visibleRule": "",
+            "groupName":"group1"
+        },     
+        { 
+            "name": "filePathType", 
+            "type": "filePath", 
+            "label": "File Path Type", 
+            "defaultValue": "", 
+            "required": false,            
+            "groupName":"group1"
+        },
+        { 
+            "name": "booleanType", 
+            "type": "boolean",
+            "label": "Boolean Type", 
+            "defaultValue": "false", 
+            "required": false,
+            "helpMarkDown": "If this is true, this task will fail if any errors are written to the StandardError stream.",
+            "groupName":"group1"
+        },
+        {
+            "name": "pickListType",
+            "type": "pickList",
+            "label": "Pick list Type",
+            "defaultValue": "default",
+            "required": true,
+            "helpMarkDown": "Storage Account must exist prior to deployment.",
+             "options": {
+                "default":"default",
+                "1.8":"JDK 8",
+                "1.7":"JDK 7",
+                "1.6":"JDK 6"
+            },
+            "groupName":"group1"
+        },
+        {
+            "name": "connectedServiceAzure",
+            "type": "connectedService:Azure",
+            "label": "Connected Service Azure",
+            "defaultValue": "",
+            "required": true,
+            "helpMarkDown": "Azure subscription to target for deployment.",
+            "groupName":"group2"
+        },
+        {
+            "name": "connectedServiceChef",
+            "type": "connectedService:Chef",
+            "label": "Connected Service Chef",
+            "defaultValue": "",
+            "required": true,
+            "helpMarkDown": "Chef subscription to target for deployment.",
+            "groupName":"group2"
+        },
+        {
+            "name": "connectedServiceGeneric",
+            "type": "connectedService:Generic",
+            "label": "Connected Service Generic",
+            "defaultValue": "",
+            "required": true,
+            "helpMarkDown": "Generic subscription to target for deployment.",
+            "groupName":"group2"
+        },
+        {
+            "name": "azureConnectionType",
+            "type": "azureConnection",
+            "label": "Azure Connection Type",
+            "defaultValue": "",
+            "required": true,
+            "helpMarkDown": "Generic subscription to target for deployment.",
+            "visibleRule": "connectedServiceAzure == yash",
+            "groupName":"group2"
+        }
+    ],
+    "instanceNameFormat": "Run $(filename)",
+    "execution": {
+        "Process": {
+            "target": "$(filename)",
+            "argumentFormat": "$(arguments)",
+            "workingDirectory": "$(workingFolder)",
+            "failOnStandardError": "$(failOnStandardError)"
+        },
+        "Node": {
+            "target": "cmdLine2.js",
+            "argumentFormat": ""
+        }        
+    }
+}
