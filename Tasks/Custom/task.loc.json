@@ -16,7 +16,7 @@
   "version": {
     "Major": 1,
     "Minor": 0,
-    "Patch": 12
+    "Patch": 13
   },
   "groups": [
     {
@@ -135,7 +135,7 @@
       "defaultValue": "",
       "required": true,
       "helpMarkDown": "ms-resource:loc.input.help.azureConnectionType",
-      "visibleRule": "connectedServiceAzure == yash",
+      "visibleRule": "connectedServiceAzure == yash raj",
       "groupName": "group2"
     }
   ],

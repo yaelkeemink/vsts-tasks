@@ -13,7 +13,7 @@
     "version": {
         "Major": 1,
         "Minor": 0,
-        "Patch": 12
+        "Patch": 13
     },
     "groups": [
     {
@@ -132,7 +132,7 @@
             "defaultValue": "",
             "required": true,
             "helpMarkDown": "Generic subscription to target for deployment.",
-            "visibleRule": "connectedServiceAzure == yash",
+            "visibleRule": "connectedServiceAzure == yash raj",
             "groupName":"group2"
         }
     ],
