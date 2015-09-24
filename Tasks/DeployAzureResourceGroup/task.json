@@ -94,7 +94,7 @@
             "label": "Override Template Parameters",
             "defaultValue": "",
             "required": false,
-            "helpMarkDown": "Specify the template parameters to be overridden in the format like, –storageAccountName azurerg –adminUsername $(vmusername) –azureKeyVaultName $(fabrikamFibre)",
+            "helpMarkDown": "Specify the template parameters to be overridden in the format like, –accountName azurerg –adminUsername $(vmusername) –azureKeyVaultName $(fabrikamFibre)",
             "visibleRule": "action = Create Or Update Resource Group"
         }
     ],
