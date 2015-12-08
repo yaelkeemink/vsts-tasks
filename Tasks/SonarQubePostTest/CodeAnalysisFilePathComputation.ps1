@@ -15,7 +15,8 @@ function ConstructComponentKeyAndPathMap($json)
 
 function IsComponentFormatValid($tokens)
 {
-    #expected format for component '[SonarQube project key]:[SonarQube project value]:[MSBuild project guid]:[file name relative to MSBuild project file path]'
+    #expected format for component '[SonarQube project key]:[SonarQube project value]:[MSBuild project guid]:[branch]:[file name relative to MSBuild project file path]' or
+    # '[SonarQube project key]:[SonarQube project value]:[MSBuild project guid]:[file name relative to MSBuild project file path]'
     $isFormatValid = $false
 
     if (!$tokens)
@@ -23,9 +24,9 @@ function IsComponentFormatValid($tokens)
         Write-Verbose "IsComponentFormatValid: tokens is invalid"
         return $isFormatValid
     }
-    if ($tokens.Count -ne 4) 
+    if ($tokens.Count -ne 4  -and $tokens.Count -ne 5) 
     {
-        Write-Verbose "IsComponentFormatValid: component is not in expected format, token count is not equal to 4"
+        Write-Verbose "IsComponentFormatValid: component is not in expected format, token count is not equal to 4 or 5"
         return $isFormatValid
     }
 
@@ -54,7 +55,8 @@ function GetRelativeFilePath($component)
         return $relativeFilePath
     }
 
-    #sonar runner creates the component value as '[SonarQube project key]:[SonarQube project value]:[MSBuild project guid]:[file name relative to MSBuild project file path]'
+    #sonar runner creates the component value as '[SonarQube project key]:[SonarQube project value]:[MSBuild project guid]:[branch]:[file name relative to MSBuild project file path]'
+    # or '[SonarQube project key]:[SonarQube project value]:[MSBuild project guid]:[file name relative to MSBuild project file path]'
     $tokens = $component.ToString().Split(":")
     $isFormatValid = IsComponentFormatValid($tokens)
     if (!$isFormatValid)

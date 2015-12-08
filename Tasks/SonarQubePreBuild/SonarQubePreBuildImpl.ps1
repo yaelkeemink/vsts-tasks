@@ -74,6 +74,8 @@ function CreateCommandLineArgs
 
     if (![String]::IsNullOrWhiteSpace($additionalArguments))
     {
+        Write-Verbose "Passed command line args - $additionalArguments"
+        $additionalArguments = PopulateBaselineBranchVariable $additionalArguments
         [void]$sb.Append(" " + $additionalArguments) # the user should take care of escaping the extra settings
     }
 
@@ -88,6 +90,96 @@ function CreateCommandLineArgs
     }
 
     return $sb.ToString();
+}
+
+# Replaces $(MSBuild.SonarQube.BaselineBranch) in the passed string with the baseline branch
+function PopulateBaselineBranchVariable([string]$str) 
+{
+    $regExForBaselineVariable = '\$\(MSBuild.SonarQube.BaselineBranch\)'
+    if ( $str -match $regExForBaselineVariable) 
+    {
+        $baselineBranch = GetBaselineBranch
+        $str = $str -replace $regExForBaselineVariable, $baselineBranch
+        Write-Verbose "Populated MSBuild.SonarQube.BaselineBranch variable - $str"
+    }
+    return $str
+}
+
+function GetBaselineBranch()
+{
+    $repoProvider = Get-TaskVariable $distributedTaskContext "build.repository.provider"
+    Write-Verbose "build.repository.provider - $repoProvider"
+    
+    $branchId = $null   
+    if($repoProvider -ieq "tfsgit")  # for vso git pull request, we add baseline branch 
+    {
+        $pullRequestNumber = GetPullRequestNumberForVSOGit
+        if ($pullRequestNumber -gt 0) #vso git pull request
+        {
+            $branchId = GetSourceBranchNameForVSOGitPullRequest $pullRequestNumber
+            Write-Verbose "Fetched source branch from pull request - $branchId"
+        }
+    }
+    if ($branchId -eq $null)
+    {
+          $branchId = Get-TaskVariable $distributedTaskContext "build.sourcebranch"
+          Write-Verbose "Fetched source branch from build.sourcebranch - $branchId"
+    }
+    
+    return $branchId
+}
+
+function GetPullRequestNumberForVSOGit()
+{
+    $sourceBranch = GetTaskContextVariable "build.sourcebranch"
+    $pullRequestNumber = 0
+
+    if (![string]::IsNullOrWhiteSpace($sourceBranch) -and $sourceBranch.StartsWith("refs/pull/", "CurrentCultureIgnoreCase"))
+    {
+        #Branch name is of format refs/pull/pullRequestNo/merge
+        $pullRequestNumber = [convert]::ToInt32($sourceBranch.Split('/')[2])
+    }
+    Write-Verbose "Fetched pull request number $pullRequestNumber"
+    return $pullRequestNumber
+}
+
+function GetSourceBranchNameForVSOGitPullRequest([int]$pullRequestNo)
+{
+    import-module "Microsoft.TeamFoundation.SourceControl.WebApi"
+    
+    $collectionUri = Get-TaskVariable $distributedTaskContext "System.TeamFoundationCollectionUri"
+    $repoId = Get-TaskVariable $distributedTaskContext "build.repository.id"
+
+    Write-Verbose "Fetching source branch id for pull request build with collectionUri - $collectionUri ; repoId - $repoId"
+
+    $retryCount = 0
+    $maxRetryCount = 3;
+    $branchId = ""
+    while ($retryCount -lt $maxRetryCount -and [string]::IsNullOrEmpty($branchId))
+    {
+        $retryCount++;
+        try
+        {
+            $vssConnection = [Microsoft.TeamFoundation.DistributedTask.Task.Internal.Core.TaskContextHelper]::GetVssConnection($distributedTaskContext) 
+
+            $gitHttpClient = New-Object Microsoft.TeamFoundation.SourceControl.WebApi.GitHttpClient -ArgumentList @($collectionUri, $vssConnection.Credentials)
+            $gitPullRequestTask = $gitHttpClient.GetPullRequestAsync($repoId, $pullRequestNo)
+            $branchId = $gitPullRequestTask.Result.TargetRefName
+        }
+        catch [Exception]
+        {
+            $exceptionMessage = $_.Exception.Message
+            $stackTrace = $_.Exception.StackTrace
+            Write-Host "RetryTime -  $retryCount. Unable to fetch pull request details. - $exceptionMessage - stacktrace - $stackTrace"
+            
+            if($retryCount -eq $maxRetryCount)
+            {
+                throw $_.Exception
+            }
+        }
+    }
+    Write-Verbose "Fetched source branch from pull request - $branchId"
+    return $branchId
 }
 
 function UpdateArgsForPullRequestAnalysis($cmdLineArgs, $serviceEndpoint)
