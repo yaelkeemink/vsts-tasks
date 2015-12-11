@@ -70,16 +70,19 @@ function Validate-AzurePowershellVersion
 function Get-AzureUtility
 {
     $currentVersion =  Get-AzureCmdletsVersion
+    Write-Verbose -Verbose "Azure PowerShell version: $currentVersion"
     $minimumAzureVersion = New-Object System.Version(0, 9, 9)
     $versionCompatible = Get-AzureVersionComparison -AzureVersion $currentVersion -CompareVersion $minimumAzureVersion
 
     if(!$versionCompatible)
     {
-        return "AzureUtility9.8.ps1"
+        Write-Verbose -Verbose "Required AzureUtility: AzureUtilityLTE9.8.ps1"
+        return "AzureUtilityLTE9.8.ps1"
     }
 	else
 	{
-	   return "AzureUtility1.0.ps1"
+       Write-Verbose -Verbose "Required AzureUtility: AzureUtilityGTE1.0.ps1"
+	   return "AzureUtilityGTE1.0.ps1"
 	}
 }
 
@@ -427,15 +430,6 @@ function Invoke-OperationOnMachine
     $response
 }
 
-function Initialize-GlobalMaps
-{
-    $fqdnMap = @{}
-        Set-Variable -Name fqdnMap -Value $fqdnMap -Scope "Global"
-
-    $winRmHttpsPortMap = @{}
-    Set-Variable -Name winRmHttpsPortMap -Value $winRmHttpsPortMap -Scope "Global"
-}
-
 function Instantiate-Environment
 {
     param([string]$resourceGroupName,
@@ -480,9 +474,13 @@ function Instantiate-Environment
 
 function Get-MachinesFqdnsForLB
 {
-    param([string]$resourceGroupName)
+    param([string]$resourceGroupName,
+	      [Object]$publicIPAddressResources,
+	      [Object]$networkInterfaceResources,
+	      [Object]$frontEndIPConfigs,
+	      [System.Collections.Hashtable]$fqdnMap)
 
-    if([string]::IsNullOrEmpty($resourceGroupName) -eq $false -and $publicIPAddressResources -and $networkInterfaceResources -and $azureVMResources -and $frontEndIPConfigs)
+    if([string]::IsNullOrEmpty($resourceGroupName) -eq $false -and $publicIPAddressResources -and $networkInterfaceResources -and $frontEndIPConfigs)
     {
         Write-Verbose "Trying to get FQDN for the RM azureVM resources from resource group: $resourceGroupName" -Verbose
 
@@ -542,9 +540,12 @@ function Get-MachinesFqdnsForLB
 function Get-FrontEndPorts
 {
     param([string]$backEndPort,
-          [System.Collections.Hashtable]$portList)
+          [System.Collections.Hashtable]$portList,
+		  [Object]$networkInterfaceResources,
+		  [Object]$inboundRules
+		  )
 
-    if([string]::IsNullOrEmpty($backEndPort) -eq $false -and $networkInterfaceResources -and $inboundRules -and $azureVMResources)
+    if([string]::IsNullOrEmpty($backEndPort) -eq $false -and $networkInterfaceResources -and $inboundRules)
     {
         Write-Verbose "Trying to get front end ports for $backEndPort" -Verbose
 
@@ -587,6 +588,7 @@ function Get-MachineNameFromId
     param([string]$resourceGroupName,
           [System.Collections.Hashtable]$map,
           [string]$mapParameter,
+		  [Object]$azureVMResources,
           [boolean]$throwOnTotalUnavaialbility)
 
     if($map)
@@ -630,9 +632,13 @@ function Get-MachineNameFromId
 
 function Get-MachinesFqdns
 {
-    param([string]$resourceGroupName)
+    param([string]$resourceGroupName,
+	      [Object]$publicIPAddressResources,
+	      [Object]$networkInterfaceResources,
+		  [Object]$azureVMResources,
+		  [System.Collections.Hashtable]$fqdnMap)
 
-    if([string]::IsNullOrEmpty($resourceGroupName) -eq $false -and $publicIPAddressResources -and $networkInterfaceResources -and $azureVMResources)
+    if([string]::IsNullOrEmpty($resourceGroupName) -eq $false -and $publicIPAddressResources -and $networkInterfaceResources)
     {
         Write-Verbose "Trying to get FQDN for the RM azureVM resources from resource Group $resourceGroupName" -Verbose
 
@@ -666,7 +672,7 @@ function Get-MachinesFqdns
             }
         }
 
-        $fqdnMap = Get-MachineNameFromId -resourceGroupName $resourceGroupName -Map $fqdnMap -MapParameter "FQDN" -ThrowOnTotalUnavaialbility $true
+        $fqdnMap = Get-MachineNameFromId -resourceGroupName $resourceGroupName -Map $fqdnMap -MapParameter "FQDN" -azureVMResources $azureVMResources -ThrowOnTotalUnavaialbility $true
     }
 
     Write-Verbose "Got FQDN for the RM azureVM resources from resource Group $resourceGroupName" -Verbose
@@ -678,75 +684,59 @@ function Get-AzureVMsDetailsInResourceGroup
 {
     param([string]$resourceGroupName)
 
-    $vmResources = Get-MachineConnectionInformation -resourceGroupName $resourceGroupName
-	
+	[hashtable]$fqdnMap = @{};
+	[hashtable]$winRmHttpsPortMap = @{}
 	[hashtable]$vmResourcesDetails = @{}
-    foreach ($resource in $vmResources)
-    {
-        $resourceName = $resource.Name
-        $resourceFQDN = $fqdnMap[$resourceName]
-        $resourceWinRmHttpsPort = $winRmHttpsPortMap[$resourceName]
-        if([string]::IsNullOrWhiteSpace($resourceWinRmHttpsPort))
-        {
-            Write-Verbose -Verbose "Defaulting WinRmHttpsPort of $resourceName to 5986"
-            $resourceWinRmHttpsPort = "5986"
-        }
-
-        $resourceProperties = @{}
-        $resourceProperties.Name = $resourceName
-        $resourceProperties.fqdn = $resourceFQDN
-        $resourceProperties.winRMHttpsPort = $resourceWinRmHttpsPort
-
-        $vmResourcesDetails.Add($resourceName, $resourceProperties)
-    }
-
-    return $vmResourcesDetails	
-}
-
-function Get-MachineConnectionInformation
-{
-    param([string]$resourceGroupName)
-
+	
     if ([string]::IsNullOrEmpty($resourceGroupName) -eq $false)
     {
-	    $ResourcesDestails = Get-AzureVMsConnectionDetailsInResourceGroup -resourceGroupName $resourceGroupName
-	
-	    $azureVMResources = $ResourcesDestails["azureVMResources"]
-        Set-Variable -Name azureVMResources -Value $azureVMResources -Scope "Global"
-	
-	    $networkInterfaceResources = $ResourcesDestails["networkInterfaceResources"]
-	    Set-Variable -Name networkInterfaceResources -Value $networkInterfaceResources -Scope "Global"
-	
-	    $publicIPAddressResources = $ResourcesDestails["publicIPAddressResources"]
-	    Set-Variable -Name publicIPAddressResources -Value $publicIPAddressResources -Scope "Global"
-	
-    	$loadBalancerResources = $ResourcesDestails["loadBalancerResources"]
+	    $ResourcesDetails = Get-AzureVMsConnectionDetailsInResourceGroup -resourceGroupName $resourceGroupName	
+
+	    $azureVMResources = $ResourcesDetails["azureVMResources"]
+	    $networkInterfaceResources = $ResourcesDetails["networkInterfaceResources"]	
+	    $publicIPAddressResources = $ResourcesDetails["publicIPAddressResources"]	
+    	$loadBalancerResources = $ResourcesDetails["loadBalancerResources"]
 	
 	    if($loadBalancerResources)
     	{
 	        foreach($lbName in $loadBalancerResources.Keys)
 	    	{
-		         $lbDetails = $loadBalancerResources[$lbName]
-			 
-		    	 $frontEndIPConfigs = $lbDetails["frontEndIPConfigs"]
-		    	 Set-Variable -Name frontEndIPConfigs -Value $frontEndIPConfigs -Scope "Global"
-			 
-		    	 $inboundRules = $lbDetails["inboundRules"]
-		    	 Set-Variable -Name inboundRules -Value $inboundRules -Scope "Global"
+		        $lbDetails = $loadBalancerResources[$lbName]			 
+		    	$frontEndIPConfigs = $lbDetails["frontEndIPConfigs"]			 
+		    	$inboundRules = $lbDetails["inboundRules"]
 			 			 
-		    	 $fqdnMap = Get-MachinesFqdnsForLB -resourceGroupName $resourceGroupName
-                 $winRmHttpsPortMap = Get-FrontEndPorts -BackEndPort "5986" -PortList $winRmHttpsPortMap
+		    	$fqdnMap = Get-MachinesFqdnsForLB -resourceGroupName $resourceGroupName -publicIPAddressResources $publicIPAddressResources -networkInterfaceResources $networkInterfaceResources -frontEndIPConfigs $frontEndIPConfigs -fqdnMap $fqdnMap
+                $winRmHttpsPortMap = Get-FrontEndPorts -BackEndPort "5986" -PortList $winRmHttpsPortMap -networkInterfaceResources $networkInterfaceResources -inboundRules $inboundRules
 		    }
 		
-	    	$fqdnMap = Get-MachineNameFromId -resourceGroupName $resourceGroupName -Map $fqdnMap -MapParameter "FQDN" -ThrowOnTotalUnavaialbility $true
-            $winRmHttpsPortMap = Get-MachineNameFromId -Map $winRmHttpsPortMap -MapParameter "Front End port" -ThrowOnTotalUnavaialbility $false
+	    	$fqdnMap = Get-MachineNameFromId -resourceGroupName $resourceGroupName -Map $fqdnMap -MapParameter "FQDN" -azureVMResources $azureVMResources -ThrowOnTotalUnavaialbility $true
+            $winRmHttpsPortMap = Get-MachineNameFromId -Map $winRmHttpsPortMap -MapParameter "Front End port" -azureVMResources $azureVMResources -ThrowOnTotalUnavaialbility $false
 	    }
 	    else
 	    {
-	        $fqdnMap = Get-MachinesFqdns -resourceGroupName $resourceGroupName
+	        $fqdnMap = Get-MachinesFqdns -resourceGroupName $resourceGroupName -publicIPAddressResources $publicIPAddressResources -networkInterfaceResources $networkInterfaceResources -azureVMResources $azureVMResources -fqdnMap $fqdnMap
             $winRmHttpsPortMap = New-Object 'System.Collections.Generic.Dictionary[string, string]'
 	    }
+
+		foreach ($resource in $azureVMResources)
+        {
+            $resourceName = $resource.Name
+            $resourceFQDN = $fqdnMap[$resourceName]
+            $resourceWinRmHttpsPort = $winRmHttpsPortMap[$resourceName]
+            if([string]::IsNullOrWhiteSpace($resourceWinRmHttpsPort))
+            {
+                Write-Verbose -Verbose "Defaulting WinRmHttpsPort of $resourceName to 5986"
+                $resourceWinRmHttpsPort = "5986"
+            }
+
+            $resourceProperties = @{}
+            $resourceProperties.Name = $resourceName
+            $resourceProperties.fqdn = $resourceFQDN
+            $resourceProperties.winRMHttpsPort = $resourceWinRmHttpsPort
+
+            $vmResourcesDetails.Add($resourceName, $resourceProperties)
+        }
 		
-		return $azureVMResources
+        return $vmResourcesDetails
     }
 }

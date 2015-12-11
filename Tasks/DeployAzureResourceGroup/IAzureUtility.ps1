@@ -1,5 +1,4 @@
 # create ResourceGroup with name $resourceGroupName at $location if it is not already present.
-
 function Create-AzureResourceGroupIfNotExist
 {
     param([string]$resourceGroupName,
@@ -8,8 +7,7 @@ function Create-AzureResourceGroupIfNotExist
 
 # Deploy $csmFile template on ResourceGroup $resourceGroupName.
 # Return  hash with following format: @{"azureResourceGroupDeployment" = $($azureResourceGroupDeployment); "deploymentError" = $($deploymentError)}
-# Where $azureResourceGroupDeployment is deploymentResponse and $deploymentError is deployment error.
-	
+# Where $azureResourceGroupDeployment is deploymentResponse and $deploymentError is deployment error.	
 function Deploy-AzureResourceGroup
 {
     param([string]$csmFile,
@@ -21,7 +19,6 @@ function Deploy-AzureResourceGroup
 
 # Return instanceView of all VMs in ResourceGroup $resourceGroupName.
 # Return type is a hash with key = VMName, Value = InstanceView_of_VM
-
 function Get-AllVmInstanceView
 {
     param([string]$resourceGroupName)
@@ -69,7 +66,7 @@ function Delete-ResourceGroup
 
 # Return Details of all Classic VMs in ResourceGroup $resourceGroupName
 # Return type is hash table with key = VMName, Value = resourceProperties
-# Where resourceProperties = @("Name" = resourceName; "fqdn" = resourceFQDN; "winRMHttpsPort" = resourceWinRmHttpsPort)
+# Where resourceProperties = @{"Name" = resourceName; "fqdn" = resourceFQDN; "winRMHttpsPort" = resourceWinRmHttpsPort}
 function Get-AzureClassicVMsDetailsInResourceGroup
 {
     param([string]$resourceGroupName)
@@ -77,7 +74,7 @@ function Get-AzureClassicVMsDetailsInResourceGroup
 }
 
 # Returns All Details related to RM VM Connection
-# Return type is hash table in following format: @("azureVMResources" = azureVMResources; "networkInterfaceResources" = networkInterfaceResources; "publicIPAddressResources" = publicIPAddressResources; "loadBalancerResources" = LoadBalancerDestails)
+# Return type is hash table in following format: @{"azureVMResources" = azureVMResources; "networkInterfaceResources" = networkInterfaceResources; "publicIPAddressResources" = publicIPAddressResources; "loadBalancerResources" = LoadBalancerDestails}
 # Where LoadBalancerDestails is hash table in following format: @{"frontEndIPConfigs" = frontEndIPConfigs; "inboundRules" = inboundRules}
 
 function Get-AzureVMsConnectionDetailsInResourceGroup

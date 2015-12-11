@@ -45,7 +45,6 @@ try
     . ./Utility.ps1
 	
 	Validate-AzurePowershellVersion
-	Initialize-GlobalMaps
 
 	$azureUtility = Get-AzureUtility	
 	Write-Verbose -Verbose "loading $azureUtility"	
