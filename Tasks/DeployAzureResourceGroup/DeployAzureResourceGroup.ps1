@@ -42,27 +42,16 @@ try
 {
     $ErrorActionPreference = "Stop"
 
-    if(-not $UnderTestCondition)
-    {
-        . ./Utility.ps1
-        Import-Module ./AzureUtility.ps1 -Force
-    }
+    . ./Utility.ps1
+	
+	Validate-AzurePowershellVersion
+	Initialize-GlobalMaps
 
-    Initialize-GlobalMaps
-
-    Validate-AzurePowershellVersion
-
-    #Handle-SwitchAzureMode
-    $isSwitchAzureModeRequired = Is-SwitchAzureModeRequired
-
-    . ./AzureResourceManagerHelper.ps1
-
-    if($isSwitchAzureModeRequired)
-    {
-    .     ./AzureResourceManagerWrapper.ps1
-    }
-
-    if( $action -eq "Select Resource Group")
+	$azureUtility = Get-AzureUtility	
+	Write-Verbose -Verbose "loading $azureUtility"	
+	. ./$azureUtility
+	
+	if( $action -eq "Select Resource Group")
     {
         if([string]::IsNullOrEmpty($outputVariable))
         {
@@ -80,16 +69,11 @@ try
         Write-TaskSpecificTelemetry "PREREQ_InvalidServiceConnectionType"
         throw (Get-LocalizedString -Key "Certificate based authentication only works with the 'Select Resource Group' action. Please select an Azure subscription with either Credential or SPN based authentication.")
     }
-
-    if($isSwitchAzureModeRequired)
-    {
-        Switch-AzureMode AzureResourceManager
-    }
-
+	
     if( $action -eq "Create Or Update Resource Group" )
     {
-        Create-AzureResourceGroupHelper -csmFile $csmFile -csmParametersFile $csmParametersFile -resourceGroupName $resourceGroupName -location $location -overrideParameters $overrideParameters -isSwitchAzureModeRequired $isSwitchAzureModeRequired
-        if(-not [string]::IsNullOrEmpty($outputVariable))
+        Create-AzureResourceGroup -csmFile $csmFile -csmParametersFile $csmParametersFile -resourceGroupName $resourceGroupName -location $location -overrideParameters $overrideParameters
+	    if(-not [string]::IsNullOrEmpty($outputVariable))
         {
             Instantiate-Environment -resourceGroupName $resourceGroupName -outputVariable $outputVariable
         }
