@@ -87,24 +87,26 @@ function Get-AzureVMsInResourceGroup
     param([string]$resourceGroupName)
 
     Switch-AzureMode AzureResourceManager
-    try
-    {
-        Write-Verbose -Verbose "[Azure Call]Getting resource group:$resourceGroupName RM virtual machines type resources"
-        $azureVMResources = Get-AzureVM -ResourceGroupName $resourceGroupName -Verbose
-        Write-Verbose -Verbose "[Azure Call]Got resource group:$resourceGroupName RM virtual machines type resources"
-        Set-Variable -Name azureVMResources -Value $azureVMResources -Scope "Global"
+	If([string]::IsNullOrEmpty($resourceGroupName) -eq $false)
+	{
+        try
+        {
+            Write-Verbose -Verbose "[Azure Call]Getting resource group:$resourceGroupName RM virtual machines type resources"
+            $azureVMResources = Get-AzureVM -ResourceGroupName $resourceGroupName -Verbose
+            Write-Verbose -Verbose "[Azure Call]Got resource group:$resourceGroupName RM virtual machines type resources"
+        }
+        catch [Microsoft.WindowsAzure.Commands.Common.ComputeCloudException],[System.MissingMethodException], [System.Management.Automation.PSInvalidOperationException]
+        {
+            Write-Verbose $_.Exception.Message -Verbose
+            throw (Get-LocalizedString -Key "Ensure resource group '{0}' exists and has atleast one virtual machine in it" -ArgumentList $resourceGroupName)
+        }
+        catch
+        {
+            throw
+        }
+		
+		return $azureVMResources
     }
-    catch [Microsoft.WindowsAzure.Commands.Common.ComputeCloudException],[System.MissingMethodException], [System.Management.Automation.PSInvalidOperationException]
-    {
-        Write-Verbose $_.Exception.Message -Verbose
-        throw (Get-LocalizedString -Key "Ensure resource group '{0}' exists and has atleast one virtual machine in it" -ArgumentList $resourceGroupName)
-    }
-    catch
-    {
-        throw
-    }
-
-    return $azureVMResources
 }
 
 function Start-Machine
@@ -113,11 +115,12 @@ function Start-Machine
           [string]$machineName)
 
     Switch-AzureMode AzureResourceManager
-
-    Write-Host (Get-LocalizedString -Key "[Azure Resource Manager]Starting machine '{0}'" -ArgumentList $machineName)
-    $response = Start-AzureVM -Name $machineName -ResourceGroupName $resourceGroupName -ErrorAction Stop -Verbose
-    Write-Host (Get-LocalizedString -Key "[Azure Resource Manager]Started machine '{0}' from Azure provider" -ArgumentList $machineName)
-
+    if([string]::IsNullOrEmpty($resourceGroupName) -eq $false -and [string]::IsNullOrEmpty($machineName) -eq $false)
+	{
+	    Write-Host (Get-LocalizedString -Key "[Azure Resource Manager]Starting machine '{0}'" -ArgumentList $machineName)
+	    $response = Start-AzureVM -Name $machineName -ResourceGroupName $resourceGroupName -ErrorAction Stop -Verbose
+	    Write-Host (Get-LocalizedString -Key "[Azure Resource Manager]Started machine '{0}' from Azure provider" -ArgumentList $machineName)
+	}
     return $response
 }
 
@@ -127,11 +130,12 @@ function Stop-Machine
           [string]$machineName)
 
     Switch-AzureMode AzureResourceManager
-
-    Write-Host (Get-LocalizedString -Key "[Azure Resource Manager]Stopping machine '{0}'" -ArgumentList $machineName)
-    $response = Stop-AzureVM -Name $machineName -ResourceGroupName $resourceGroupName -Force -ErrorAction Stop -Verbose
-    Write-Host (Get-LocalizedString -Key "[Azure Resource Manager]Stopped machine '{0}' from Azure provider" -ArgumentList $machineName)
-
+	if([string]::IsNullOrEmpty($resourceGroupName) -eq $false -and [string]::IsNullOrEmpty($machineName) -eq $false)
+	{
+        Write-Host (Get-LocalizedString -Key "[Azure Resource Manager]Stopping machine '{0}'" -ArgumentList $machineName)
+        $response = Stop-AzureVM -Name $machineName -ResourceGroupName $resourceGroupName -Force -ErrorAction Stop -Verbose
+        Write-Host (Get-LocalizedString -Key "[Azure Resource Manager]Stopped machine '{0}' from Azure provider" -ArgumentList $machineName)
+	}
     return $response
 }
 
@@ -141,10 +145,12 @@ function Delete-Machine
           [string]$machineName)
 
     Switch-AzureMode AzureResourceManager
-    Write-Host (Get-LocalizedString -Key "[Azure Resource Manager]Deleting machine '{0}'" -ArgumentList $machineName)
-    $response = Remove-AzureVM -Name $machineName -ResourceGroupName $resourceGroupName -Force -ErrorAction Stop -Verbose
-    Write-Host (Get-LocalizedString -Key "[Azure Resource Manager]Deleted machine '{0}' from Azure provider" -ArgumentList $machineName)
-
+    if([string]::IsNullOrEmpty($resourceGroupName) -eq $false -and [string]::IsNullOrEmpty($machineName) -eq $false)
+	{
+        Write-Host (Get-LocalizedString -Key "[Azure Resource Manager]Deleting machine '{0}'" -ArgumentList $machineName)
+        $response = Remove-AzureVM -Name $machineName -ResourceGroupName $resourceGroupName -Force -ErrorAction Stop -Verbose
+        Write-Host (Get-LocalizedString -Key "[Azure Resource Manager]Deleted machine '{0}' from Azure provider" -ArgumentList $machineName)
+	}
     return $response
 }
 
@@ -153,10 +159,12 @@ function Delete-ResourceGroup
     param([string]$resourceGroupName)
 
     Switch-AzureMode AzureResourceManager
-
-    Write-Host (Get-LocalizedString -Key "[Azure Resource Manager]Deleting resource group '{0}'" -ArgumentList $resourceGroupName)
-    Remove-AzureResourceGroup -Name $resourceGroupName -Force -ErrorAction Stop -Verbose
-    Write-Host (Get-LocalizedString -Key "[Azure Resource Manager]Deleted resource group '{0}'" -ArgumentList $resourceGroupName)
+	if([string]::IsNullOrEmpty($resourceGroupName) -eq $false)
+	{
+	    Write-Host (Get-LocalizedString -Key "[Azure Resource Manager]Deleting resource group '{0}'" -ArgumentList $resourceGroupName)
+	    Remove-AzureResourceGroup -Name $resourceGroupName -Force -ErrorAction Stop -Verbose
+	    Write-Host (Get-LocalizedString -Key "[Azure Resource Manager]Deleted resource group '{0}'" -ArgumentList $resourceGroupName)
+	}
 }
 
 function Get-AzureClassicVMsDetailsInResourceGroup
@@ -164,10 +172,12 @@ function Get-AzureClassicVMsDetailsInResourceGroup
     param([string]$resourceGroupName)
 
 	Switch-AzureMode AzureServiceManagement
-    Write-Verbose -Verbose "[Azure Call]Getting resource group:$resourceGroupName classic virtual machines type resources"
-    $azureClassicVMResources = Get-AzureVM -ServiceName $resourceGroupName -ErrorAction SilentlyContinue -WarningAction SilentlyContinue
-    Write-Verbose -Verbose "[Azure Call]Got resource group:$resourceGroupName classic virtual machines type resources"
-	
+	if([string]::IsNullOrEmpty($resourceGroupName) -eq $false)
+	{
+  	   Write-Verbose -Verbose "[Azure Call]Getting resource group:$resourceGroupName classic virtual machines type resources"
+  	   $azureClassicVMResources = Get-AzureVM -ServiceName $resourceGroupName -ErrorAction SilentlyContinue -WarningAction SilentlyContinue
+  	   Write-Verbose -Verbose "[Azure Call]Got resource group:$resourceGroupName classic virtual machines type resources"
+	}
 	[hashtable]$classicVMsDestails = @{}
 	
 	if($azureClassicVMResources)
