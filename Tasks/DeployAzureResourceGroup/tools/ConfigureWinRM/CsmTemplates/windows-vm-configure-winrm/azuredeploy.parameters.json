@@ -1,0 +1,21 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "newStorageAccountName": {
+            "value": "pavannewstorage14"
+        },
+        "adminUsername": {
+            "value": "lmtstlab"
+        },
+        "adminPassword": {
+            "value": "Zodiac!99"
+        },
+        "dnsNameForPublicIP": {
+            "value": "pavannewrg14"
+        },
+        "hostNameScriptArgument": {
+            "value": "*.westus.cloudapp.azure.com"
+        }
+   }
+}
