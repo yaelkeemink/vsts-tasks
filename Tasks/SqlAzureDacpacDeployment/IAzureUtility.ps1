@@ -42,27 +42,15 @@ $serverFriendlyName = $ServerName.split(".")[0]
 Write-Verbose "Server friendly name is $serverFriendlyName" -Verbose
 
 # Getting start and end IP address for agent machine
-$ipAddress = Get-AgentIPAddress -startIPAddress $StartIpAddress -endIPAddress $EndIpAddress -ipDetectionMethod $IpDetectionMethod -taskContext $distributedTaskContext
-Write-Verbose ($ipAddress | Format-List | Out-String) -Verbose
+$ipAddress = Get-AgentIPAddress -StartIPAddress $StartIpAddress -EndIPAddress $EndIpAddress -IPDetectionMethod $IpDetectionMethod -TaskContext $distributedTaskContext
 
 $startIp =$ipAddress.StartIPAddress
 $endIp = $ipAddress.EndIPAddress
 
 Try
 {
-    # Importing required version of azure cmdlets according to azureps installed on machine
-    $azureUtility = Get-AzureUtility
-
-    Write-Verbose -Verbose "Loading $azureUtility"
-    Import-Module ./$azureUtility -Force
-
-    # Getting connection type (Certificate/UserNamePassword/SPN) used for the task
-    $connectionType = Get-ConnectionType -connectedServiceName $connectedServiceName -taskContext $distributedTaskContext
-
     # creating firewall rule for agent on sql server
-    $firewallSettings = Create-AzureSqlDatabaseServerFirewallRule -startIP $startIp -endIP $endIp -serverName $serverFriendlyName
-    Write-Verbose ($firewallSettings | Format-List | Out-String) -Verbose
-
+    $firewallSettings = Create-AzureSqlDatabaseServerFirewallRule -StartIP $startIp -EndIP $endIp -ServerName $serverFriendlyName
     $firewallRuleName = $firewallSettings.RuleName
     $isFirewallConfigured = $firewallSettings.IsConfigured
 
@@ -84,8 +72,7 @@ Try
 Finally
 {
     # deleting firewall rule for agent on sql server
-    Delete-AzureSqlDatabaseServerFirewallRule -serverName $serverFriendlyName -firewallRuleName $firewallRuleName `
-                                              -isFirewallConfigured $isFirewallConfigured -deleteFireWallRule $DeleteFirewallRule
+    Delete-AzureSqlDatabaseServerFirewallRule -ServerName $serverFriendlyName -FirewallRuleName $firewallRuleName -IsFirewallConfigured $isFirewallConfigured -DeleteFireWallRule $DeleteFirewallRule
 }
 
 Write-Verbose "Leaving script DeploySqlAzure.ps1"  -Verbose

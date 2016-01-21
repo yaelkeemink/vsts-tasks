@@ -1,4 +1,4 @@
-{
+﻿{
 	"id": "CE85A08B-A538-4D2B-8589-1D37A9AB970F",
 	"name": "SqlAzureDacpacDeployment",
 	"friendlyName": "Azure SQL Database Deployment",
@@ -14,7 +14,7 @@
 	"version": {
 		"Major": 1,
 		"Minor": 0,
-		"Patch": 5
+		"Patch": 6
 	},
 	"demands": [
         "azureps",
@@ -36,7 +36,7 @@
 	"inputs": [
 		{
 			"name": "ConnectedServiceName",
-			"type": "connectedService:Azure:Certificate,UsernamePassword",
+			"type": "connectedService:Azure",
 			"label": "Azure Subscription",
 			"defaultValue": "",
 			"required": true,
