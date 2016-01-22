@@ -60,7 +60,7 @@ Try
     $connectionType = Get-ConnectionType -connectedServiceName $connectedServiceName -taskContext $distributedTaskContext
 
     # creating firewall rule for agent on sql server
-    $firewallSettings = Create-AzureSqlDatabaseServerFirewallRule -startIP $startIp -endIP $endIp -serverName $serverFriendlyName
+    $firewallSettings = Create-AzureSqlDatabaseServerFirewallRule -startIP $startIp -endIP $endIp -serverName $serverFriendlyName -connectionType $connectionType
     Write-Verbose ($firewallSettings | Format-List | Out-String) -Verbose
 
     $firewallRuleName = $firewallSettings.RuleName
@@ -84,7 +84,7 @@ Try
 Finally
 {
     # deleting firewall rule for agent on sql server
-    Delete-AzureSqlDatabaseServerFirewallRule -serverName $serverFriendlyName -firewallRuleName $firewallRuleName `
+    Delete-AzureSqlDatabaseServerFirewallRule -serverName $serverFriendlyName -firewallRuleName $firewallRuleName -connectionType $connectionType`
                                               -isFirewallConfigured $isFirewallConfigured -deleteFireWallRule $DeleteFirewallRule
 }
 

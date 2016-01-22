@@ -73,14 +73,20 @@ function Create-AzureSqlDatabaseServerFirewallRule
 {
     param([String] [Parameter(Mandatory = $true)] $startIp,
           [String] [Parameter(Mandatory = $true)] $endIp,
-          [String] [Parameter(Mandatory = $true)] $serverName)
+          [String] [Parameter(Mandatory = $true)] $serverName,
+          [String] [Parameter(Mandatory = $true)] $connectionType)
 
     [HashTable]$FirewallSettings = @{}
     $firewallRuleName = [System.Guid]::NewGuid().ToString()
 
-    Write-Verbose "[Azure Platform Call] Creating firewall rule $firewallRuleName"  -Verbose
-    New-AzureSqlDatabaseServerFirewallRule -StartIPAddress $startIp -EndIPAddress $endIp -RuleName $firewallRuleName -ServerName $serverName | Out-Null
-    Write-Verbose "[Azure Platform Call] Firewall rule $firewallRuleName created"  -Verbose
+    if($connectionType -eq 'Certificate' -or $connectionType -eq 'UserNamePassword')
+    {
+        Create-AzureSqlDatabaseServerFirewallRuleRDFE -startIPAddress $startIp -endIPAddress $endIp -serverName $serverName -firewallRuleName $firewallRuleName
+    }
+    else
+    {
+        Create-AzureSqlDatabaseServerFirewallRuleARM -startIPAddress $startIp -endIPAddress $endIp -serverName $serverName -firewallRuleName $firewallRuleName
+    }
 
     $FirewallSettings.IsConfigured = $true
     $FirewallSettings.RuleName = $firewallRuleName
@@ -92,14 +98,20 @@ function Delete-AzureSqlDatabaseServerFirewallRule
 {
     param([String] [Parameter(Mandatory = $true)] $serverName,
           [String] [Parameter(Mandatory = $true)] $firewallRuleName,
+          [String] [Parameter(Mandatory = $true)] $connectionType,
           [String] [Parameter(Mandatory = $true)] $isFirewallConfigured,
           [String] [Parameter(Mandatory = $true)] $deleteFireWallRule)
 
     if($deleteFireWallRule -eq "true" -and $isFirewallConfigured -eq "true")
     {
-        Write-Verbose "[Azure Platform Call] Removing firewall rule $firewallRuleName" -Verbose
-        Remove-AzureSqlDatabaseServerFirewallRule -ServerName $serverName -RuleName $firewallRuleName
-        Write-Verbose "[Azure Platform Call] Firewall rule $firewallRuleName removed"  -Verbose
+        if($connectionType -eq 'Certificate' -or $connectionType -eq 'UserNamePassword')
+        {
+            Delete-AzureSqlDatabaseServerFirewallRuleRDFE -serverName $serverName -firewallRuleName $firewallRuleName
+        }
+        else
+        {
+            Delete-AzureSqlDatabaseServerFirewallRuleARM -serverName $serverName -firewallRuleName $firewallRuleName
+        }
     }
 }
 
