@@ -97,9 +97,9 @@ function Create-AzureSqlDatabaseServerFirewallRule
 function Delete-AzureSqlDatabaseServerFirewallRule
 {
     param([String] [Parameter(Mandatory = $true)] $serverName,
-          [String] [Parameter(Mandatory = $true)] $firewallRuleName,
+          [String] $firewallRuleName,
           [String] [Parameter(Mandatory = $true)] $connectionType,
-          [String] [Parameter(Mandatory = $true)] $isFirewallConfigured,
+          [String] $isFirewallConfigured,
           [String] [Parameter(Mandatory = $true)] $deleteFireWallRule)
 
     if($deleteFireWallRule -eq "true" -and $isFirewallConfigured -eq "true")
