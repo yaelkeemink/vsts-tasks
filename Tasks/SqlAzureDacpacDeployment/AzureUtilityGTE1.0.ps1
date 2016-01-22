@@ -2,13 +2,13 @@
 
 function Create-AzureSqlDatabaseServerFirewallRuleRDFE
 {
-    param([String] [Parameter(Mandatory = $true)] $startIp,
-          [String] [Parameter(Mandatory = $true)] $endIp,
+    param([String] [Parameter(Mandatory = $true)] $startIPAddress,
+          [String] [Parameter(Mandatory = $true)] $endIPAddress,
           [String] [Parameter(Mandatory = $true)] $serverName,
           [String] [Parameter(Mandatory = $true)] $firewallRuleName)
 
     Write-Verbose "[Azure Platform Call] Creating firewall rule $firewallRuleName"  -Verbose
-    $azureSqlDatabaseServerFirewallRule = New-AzureSqlDatabaseServerFirewallRule -StartIPAddress $startIp -EndIPAddress $endIp -ServerName $serverName -RuleName $firewallRuleName -ErrorAction Stop| Out-Null
+    $azureSqlDatabaseServerFirewallRule = New-AzureSqlDatabaseServerFirewallRule -StartIPAddress $startIPAddress -EndIPAddress $endIPAddress -ServerName $serverName -RuleName $firewallRuleName -ErrorAction Stop| Out-Null
     Write-Verbose "[Azure Platform Call] Firewall rule $firewallRuleName created"  -Verbose
 
     return $azureSqlDatabaseServerFirewallRule
@@ -41,8 +41,8 @@ function Get-AzureSqlDatabaseServerRGName
 
 function Create-AzureSqlDatabaseServerFirewallRuleARM
 {
-    param([String] [Parameter(Mandatory = $true)] $startIp,
-          [String] [Parameter(Mandatory = $true)] $endIp,
+    param([String] [Parameter(Mandatory = $true)] $startIPAddress,
+          [String] [Parameter(Mandatory = $true)] $endIPAddress,
           [String] [Parameter(Mandatory = $true)] $serverName,
           [String] [Parameter(Mandatory = $true)] $firewallRuleName)
 
@@ -50,7 +50,7 @@ function Create-AzureSqlDatabaseServerFirewallRuleARM
     $azureResourceGroupName = Get-AzureSqlDatabaseServerRGName -serverName $serverName
 
     Write-Verbose "[Azure Platform Call] Creating firewall rule $firewallRuleName on azure database server: $serverName" -Verbose
-    $azureSqlDatabaseServerFirewallRule = New-AzureRMSqlServerFirewallRule -ResourceGroupName $azureResourceGroupName -StartIPAddress $startIp -EndIPAddress $endIp -ServerName $serverName -FirewallRuleName $firewallRuleName -ErrorAction Stop | Out-Null
+    $azureSqlDatabaseServerFirewallRule = New-AzureRMSqlServerFirewallRule -ResourceGroupName $azureResourceGroupName -StartIPAddress $startIPAddress -EndIPAddress $endIPAddress -ServerName $serverName -FirewallRuleName $firewallRuleName -ErrorAction Stop | Out-Null
     Write-Verbose "[Azure Platform Call] Firewall rule $firewallRuleName created on azure database server: $serverName" -Verbose
 
     return $azureSqlDatabaseServerFirewallRule

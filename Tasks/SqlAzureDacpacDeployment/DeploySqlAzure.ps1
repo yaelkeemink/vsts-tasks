@@ -84,7 +84,7 @@ Try
 Finally
 {
     # deleting firewall rule for agent on sql server
-    Delete-AzureSqlDatabaseServerFirewallRule -serverName $serverFriendlyName -firewallRuleName $firewallRuleName -connectionType $connectionType`
+    Delete-AzureSqlDatabaseServerFirewallRule -serverName $serverFriendlyName -firewallRuleName $firewallRuleName -connectionType $connectionType `
                                               -isFirewallConfigured $isFirewallConfigured -deleteFireWallRule $DeleteFirewallRule
 }
 
