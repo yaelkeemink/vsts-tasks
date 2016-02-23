@@ -13,7 +13,7 @@
     "version": {
         "Major": 1,
         "Minor": 0,
-        "Patch": 62
+        "Patch": 63
     },
     "demands": [
         "azureps"
@@ -207,7 +207,7 @@
         }
     ],
     "instanceNameFormat": "Azure Deployment:$(action) action on $(resourceGroupName)",
-    execution": {
+    "execution": {
         "AzurePowerShell": {
             "target": "$(currentDirectory)\\DeployAzureResourceGroup.ps1",
             "argumentFormat": "",
