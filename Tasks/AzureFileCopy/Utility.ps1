@@ -434,12 +434,12 @@ function Get-MachineNameFromId
         $errorCount = 0
         foreach($vm in $azureRMVMResources)
         {
-            $value = $map[$vm.Id]
+            $value = $map[$vm.Id.ToLower()]
             $resourceName = $vm.Name
             if(-not [string]::IsNullOrEmpty($value))
             {
                 Write-Verbose "$mapParameter value for resource $resourceName is $value" -Verbose
-                $map.Remove($vm.Id)
+                $map.Remove($vm.Id.ToLower())
                 $map[$resourceName] = $value
             }
             else
@@ -485,11 +485,11 @@ function Get-MachinesFqdnsForPublicIP
         {
             if(-not [string]::IsNullOrEmpty($publicIP.DnsSettings.Fqdn))
             {
-                $fqdnMap[$publicIp.IpConfiguration.Id] =  $publicIP.DnsSettings.Fqdn
+                $fqdnMap[$publicIp.IpConfiguration.Id.ToLower()] =  $publicIP.DnsSettings.Fqdn
             }
             else
             {
-                $fqdnMap[$publicIp.IpConfiguration.Id] =  $publicIP.IpAddress
+                $fqdnMap[$publicIp.IpConfiguration.Id.ToLower()] =  $publicIP.IpAddress
             }
         }
 
@@ -498,13 +498,13 @@ function Get-MachinesFqdnsForPublicIP
         {
             foreach($ipc in $nic.IpConfigurations)
             {
-                $fqdn =  $fqdnMap[$ipc.Id]
+                $fqdn =  $fqdnMap[$ipc.Id.ToLower()]
                 if(-not [string]::IsNullOrEmpty($fqdn))
                 {
-                    $fqdnMap.Remove($ipc.Id)
+                    $fqdnMap.Remove($ipc.Id.ToLower())
                     if($nic.VirtualMachine)
                     {
-                        $fqdnMap[$nic.VirtualMachine.Id] = $fqdn
+                        $fqdnMap[$nic.VirtualMachine.Id.ToLower()] = $fqdn
                     }
                 }
             }
@@ -533,24 +533,24 @@ function Get-MachinesFqdnsForLB
         {
             if(-not [string]::IsNullOrEmpty($publicIP.DnsSettings.Fqdn))
             {
-                $fqdnMap[$publicIp.Id] =  $publicIP.DnsSettings.Fqdn
+                $fqdnMap[$publicIp.Id.ToLower()] =  $publicIP.DnsSettings.Fqdn
             }
             else
             {
-                $fqdnMap[$publicIp.Id] =  $publicIP.IpAddress
+                $fqdnMap[$publicIp.Id.ToLower()] =  $publicIP.IpAddress
             }
         }
 
         #Get the NAT rule for a given ip id
         foreach($config in $frontEndIPConfigs)
         {
-            $fqdn = $fqdnMap[$config.PublicIpAddress.Id]
+            $fqdn = $fqdnMap[$config.PublicIpAddress.Id.ToLower()]
             if(-not [string]::IsNullOrEmpty($fqdn))
             {
-                $fqdnMap.Remove($config.PublicIpAddress.Id)
+                $fqdnMap.Remove($config.PublicIpAddress.Id.ToLower())
                 foreach($rule in $config.InboundNatRules)
                 {
-                    $fqdnMap[$rule.Id] =  $fqdn
+                    $fqdnMap[$rule.Id.ToLower()] =  $fqdn
                 }
             }
         }
@@ -562,13 +562,13 @@ function Get-MachinesFqdnsForLB
             {
                 foreach($rule in $ipc.LoadBalancerInboundNatRules)
                 {
-                    $fqdn = $fqdnMap[$rule.Id]
+                    $fqdn = $fqdnMap[$rule.Id.ToLower()]
                     if(-not [string]::IsNullOrEmpty($fqdn))
                     {
-                        $fqdnMap.Remove($rule.Id)
+                        $fqdnMap.Remove($rule.Id.ToLower())
                         if($nic.VirtualMachine)
                         {
-                            $fqdnMap[$nic.VirtualMachine.Id] = $fqdn
+                            $fqdnMap[$nic.VirtualMachine.Id.ToLower()] = $fqdn
                         }
                     }
                 }
@@ -599,7 +599,7 @@ function Get-FrontEndPorts
         {
             if($rule.BackendIPConfiguration)
             {
-                $portList[$rule.BackendIPConfiguration.Id] = $rule.FrontendPort
+                $portList[$rule.BackendIPConfiguration.Id.ToLower()] = $rule.FrontendPort
             }
         }
 
@@ -608,13 +608,13 @@ function Get-FrontEndPorts
         {
             foreach($ipConfig in $nic.IpConfigurations)
             {
-                $frontEndPort = $portList[$ipConfig.Id]
+                $frontEndPort = $portList[$ipConfig.Id.ToLower()]
                 if(-not [string]::IsNullOrEmpty($frontEndPort))
                 {
-                    $portList.Remove($ipConfig.Id)
+                    $portList.Remove($ipConfig.Id.ToLower())
                     if($nic.VirtualMachine)
                     {
-                        $portList[$nic.VirtualMachine.Id] = $frontEndPort
+                        $portList[$nic.VirtualMachine.Id.ToLower()] = $frontEndPort
                     }
                 }
             }
@@ -851,7 +851,7 @@ function Copy-FilesSequentiallyToAzureVMs
 
         if ($status -ne "Passed")
         {
-            $winrmHelpMsg = Get-LocalizedString -Key "TofixWinRMconnectionrelatedissuesselectthe"
+            $winrmHelpMsg = Get-LocalizedString -Key "To fix WinRM connection related issues, select the 'Enable Copy Prerequisites' option in the task. If set already, and the target Virtual Machines are backed by a Load balancer, ensure Inbound NAT rules are configured for target port (5986). Applicable only for ARM VMs."
             $copyErrorMessage =  $copyResponse.Error.Message + $winrmHelpMsg
             Write-Verbose "CopyErrorMessage: $copyErrorMessage" -Verbose
 
@@ -915,7 +915,7 @@ function Copy-FilesParallelyToAzureVMs
                     $errorMessage = ""
                     if($output.Error -ne $null)
                     {
-                        $winrmHelpMsg = Get-LocalizedString -Key "TofixWinRMconnectionrelatedissuesselectthe"
+                        $winrmHelpMsg = Get-LocalizedString -Key "To fix WinRM connection related issues, select the 'Enable Copy Prerequisites' option in the task. If set already, and the target Virtual Machines are backed by a Load balancer, ensure Inbound NAT rules are configured for target port (5986). If the target Virtual Machines are associated with a Network security group (NSG), configure Inbound security rules for Destination port (5986). Applicable only for ARM VMs."
                         $errorMessage = $output.Error.Message + $winrmHelpMsg
                     }
 
