@@ -37,18 +37,15 @@ function Deploy-AzureResourceGroup
           [string]$overrideParameters)
 
     Switch-AzureMode AzureResourceManager
-
-    $deploymentName = [System.IO.Path]::GetFileNameWithoutExtension($csmFile) + '-' + ((Get-Date).ToUniversalTime()).ToString('yyyyMMdd-HHmm')
-
-    Write-Host "[Azure Resource Manager]Creating resource group deployment with name $deploymentName"
+    Write-Host "[Azure Resource Manager]Creating resource group deployment with name $resourceGroupName"
 
     if (!$csmParametersFile)
     {
-        $finalCommand = "`$azureResourceGroupDeployment = New-AzureResourceGroupDeployment -Name `"$deploymentName`" -ResourceGroupName `"$resourceGroupName`" -TemplateFile `"$csmFile`" $overrideParameters -Verbose -ErrorAction silentlycontinue -ErrorVariable deploymentError"
+        $finalCommand = "`$azureResourceGroupDeployment = New-AzureResourceGroupDeployment -Name `"$resourceGroupName`" -ResourceGroupName `"$resourceGroupName`" -TemplateFile `"$csmFile`" $overrideParameters -Verbose -ErrorAction silentlycontinue -ErrorVariable deploymentError"
     }
     else
     {
-        $finalCommand = "`$azureResourceGroupDeployment = New-AzureResourceGroupDeployment -Name `"$deploymentName`" -ResourceGroupName `"$resourceGroupName`" -TemplateFile `"$csmFile`" -TemplateParameterFile `$csmParametersFile $overrideParameters -Verbose -ErrorAction silentlycontinue -ErrorVariable deploymentError"
+        $finalCommand = "`$azureResourceGroupDeployment = New-AzureResourceGroupDeployment -Name `"$resourceGroupName`" -ResourceGroupName `"$resourceGroupName`" -TemplateFile `"$csmFile`" -TemplateParameterFile `$csmParametersFile $overrideParameters -Verbose -ErrorAction silentlycontinue -ErrorVariable deploymentError"
     }
 
     Write-Verbose "$finalCommand"
