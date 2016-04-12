@@ -8,8 +8,8 @@
   "author": "Microsoft Corporation",
   "version": {
     "Major": 0,
-    "Minor": 2,
-    "Patch": 10
+    "Minor": 3,
+    "Patch": 0
   },
   "demands": [
     "npm"
@@ -17,20 +17,43 @@
   "minimumAgentVersion": "1.91.0",
   "groups": [
     {
-      "name": "advanced",
-      "displayName": "ms-resource:loc.group.displayName.advanced",
-      "isExpanded": false
+      "name": "registry",
+      "displayName": "ms-resource:loc.group.displayName.registry",
+      "isExpanded": true
     }
   ],
   "instanceNameFormat": "ms-resource:loc.instanceNameFormat",
   "inputs": [
     {
       "name": "command",
-      "type": "string",
+      "type": "pickList",
       "label": "ms-resource:loc.input.label.command",
       "defaultValue": "install",
       "helpMarkDown": "ms-resource:loc.input.help.command",
-      "required": true
+      "required": true,
+      "options": {
+        "install": "install",
+        "publish": "publish",
+        "other": "(other)"
+      }
+    },
+    {
+      "name": "package",
+      "type": "string",
+      "label": "ms-resource:loc.input.label.package",
+      "defaultValue": "",
+      "helpMarkDown": "ms-resource:loc.input.help.package",
+      "required": false,
+      "visibleRule": "command = install || command = publish"
+    },
+    {
+      "name": "tag",
+      "type": "string",
+      "label": "ms-resource:loc.input.label.tag",
+      "defaultValue": "",
+      "helpMarkDown": "ms-resource:loc.input.help.tag",
+      "required": false,
+      "visibleRule": "command = publish"
     },
     {
       "name": "arguments",
@@ -39,7 +62,7 @@
       "defaultValue": "",
       "helpMarkDown": "ms-resource:loc.input.help.arguments",
       "required": false,
-      "groupName": "advanced"
+      "visibleRule": "command = other"
     },
     {
       "name": "cwd",
@@ -47,8 +70,41 @@
       "label": "ms-resource:loc.input.label.cwd",
       "defaultValue": "",
       "required": false,
-      "helpMarkDown": "ms-resource:loc.input.help.cwd",
-      "groupName": "advanced"
+      "helpMarkDown": "ms-resource:loc.input.help.cwd"
+    },
+    {
+      "name": "registryType",
+      "type": "pickList",
+      "label": "ms-resource:loc.input.label.registryType",
+      "defaultValue": "public",
+      "helpMarkDown": "ms-resource:loc.input.help.registryType",
+      "required": true,
+      "options": {
+        "public": "Public (registry.npmjs.org)",
+        "vsts": "Internal feed",
+        "custom": "Other/external"
+      },
+      "groupName": "registry"
+    },
+    {
+      "name": "vstsFeed",
+      "type": "string",
+      "label": "ms-resource:loc.input.label.vstsFeed",
+      "defaultValue": "",
+      "required": true,
+      "helpMarkDown": "ms-resource:loc.input.help.vstsFeed",
+      "visibleRule": "registryType = vsts",
+      "groupName": "registry"
+    },
+    {
+      "name": "customFeed",
+      "type": "string",
+      "label": "ms-resource:loc.input.label.customFeed",
+      "defaultValue": "",
+      "required": true,
+      "helpMarkDown": "ms-resource:loc.input.help.customFeed",
+      "visibleRule": "registryType = custom",
+      "groupName": "registry"
     }
   ],
   "execution": {
