@@ -26,16 +26,11 @@
   "inputs": [
     {
       "name": "command",
-      "type": "pickList",
+      "type": "string",
       "label": "ms-resource:loc.input.label.command",
       "defaultValue": "install",
       "helpMarkDown": "ms-resource:loc.input.help.command",
-      "required": true,
-      "options": {
-        "install": "install",
-        "publish": "publish",
-        "other": "(other)"
-      }
+      "required": true
     },
     {
       "name": "package",
@@ -61,8 +56,7 @@
       "label": "ms-resource:loc.input.label.arguments",
       "defaultValue": "",
       "helpMarkDown": "ms-resource:loc.input.help.arguments",
-      "required": false,
-      "visibleRule": "command = other"
+      "required": false
     },
     {
       "name": "cwd",

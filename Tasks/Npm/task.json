@@ -26,16 +26,11 @@
     "inputs": [
         {
             "name": "command",
-            "type": "pickList",
+            "type": "string",
             "label": "Command",
             "defaultValue": "install",
-            "helpMarkDown": "npm command to run. [More Information](https://docs.npmjs.com/).",
-            "required": true,
-            "options": {
-                "install": "install",
-                "publish": "publish",
-                "other": "(other)"
-            }
+            "helpMarkDown": "npm command to run. Common operations are `install` and `publish`. [More Information](https://docs.npmjs.com/).",
+            "required": true
         },
         {
             "name": "package",
@@ -58,11 +53,10 @@
         {
             "name": "arguments",
             "type": "string",
-            "label": "Arguments",
+            "label": "Additional arguments",
             "defaultValue": "",
-            "helpMarkDown": "Arguments passed to npm.",
-            "required": false,
-            "visibleRule": "command = other"
+            "helpMarkDown": "Additional arguments passed to npm.",
+            "required": false
         },
         {
             "name": "cwd",
