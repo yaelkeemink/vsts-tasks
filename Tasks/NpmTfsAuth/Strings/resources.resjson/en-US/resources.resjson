@@ -1,0 +1,8 @@
+{
+  "loc.friendlyName": "npm Team Build auth",
+  "loc.helpMarkDown": "*todo*",
+  "loc.description": "Enables npm to authenticate to feeds hosted in VSTS/TFS",
+  "loc.instanceNameFormat": "npm Team Build auth",
+  "loc.input.label.feedUrl": "Registry URL",
+  "loc.input.help.feedUrl": "The URL of an npm registry hosted in this account."
+}
