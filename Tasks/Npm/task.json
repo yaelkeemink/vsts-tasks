@@ -2,14 +2,14 @@
     "id": "FE47E961-9FA8-4106-8639-368C022D43AD",
     "name": "Npm",
     "friendlyName": "npm",
-    "description": "Run an npm command",
+    "description": "Run a npm command",
     "helpMarkDown": "[More Information](http://go.microsoft.com/fwlink/?LinkID=613746)",
     "category": "Package",
     "author": "Microsoft Corporation",
     "version": {
         "Major": 0,
-        "Minor": 3,
-        "Patch": 0
+        "Minor": 2,
+        "Patch": 10
     },
     "demands": [
         "npm"
@@ -17,9 +17,9 @@
     "minimumAgentVersion": "1.91.0",
     "groups": [
         {
-            "name": "registry",
-            "displayName": "Registry",
-            "isExpanded": true
+            "name": "advanced",
+            "displayName": "Advanced",
+            "isExpanded": false
         }
     ],
     "instanceNameFormat": "npm $(command)",
@@ -29,34 +29,17 @@
             "type": "string",
             "label": "Command",
             "defaultValue": "install",
-            "helpMarkDown": "npm command to run. Common operations are `install` and `publish`. [More Information](https://docs.npmjs.com/).",
+            "helpMarkDown": "npm command to run. [More Information](https://docs.npmjs.com/).",
             "required": true
-        },
-        {
-            "name": "package",
-            "type": "string",
-            "label": "Package",
-            "defaultValue": "",
-            "helpMarkDown": "Package name, tarball, or folder. Package name may include a scope, version, and/or tag. If you leave this field empty, npm will install or publish the package.json in the current working directory.\n\nFor `npm publish`, this should be a tarball or folder.",
-            "required": false,
-            "visibleRule": "command = install || command = publish"
-        },
-        {
-            "name": "tag",
-            "type": "string",
-            "label": "Tag",
-            "defaultValue": "",
-            "helpMarkDown": "Optional [tag](https://docs.npmjs.com/cli/dist-tag) for this package. If nothing is specified, this package will be tagged `latest`.",
-            "required": false,
-            "visibleRule": "command = publish"
         },
         {
             "name": "arguments",
             "type": "string",
-            "label": "Additional arguments",
+            "label": "Arguments",
             "defaultValue": "",
             "helpMarkDown": "Additional arguments passed to npm.",
-            "required": false
+            "required": false,
+            "groupName": "advanced"
         },
         {
             "name": "cwd",
@@ -64,41 +47,8 @@
             "label": "Working Directory",
             "defaultValue": "",
             "required": false,
-            "helpMarkDown": "Current working directory where npm command is run.  Defaults to the root of the repo."
-        },
-        {
-            "name": "registryType",
-            "type": "pickList",
-            "label": "Registry type",
-            "defaultValue": "public",
-            "helpMarkDown": "*todo*",
-            "required": true,
-            "options": {
-                "public": "Public (registry.npmjs.org)",
-                "vsts": "Internal feed",
-                "custom": "Other/external"
-            },
-            "groupName": "registry"
-        },
-        {
-            "name": "vstsFeed",
-            "type": "string",
-            "label": "Internal registry URL",
-            "defaultValue": "",
-            "required": true,
-            "helpMarkDown": "The URL of an npm registry hosted in this account.",
-            "visibleRule": "registryType = vsts",
-            "groupName": "registry"
-        },
-        {
-            "name": "customFeed",
-            "type": "string",
-            "label": "External registry URL",
-            "defaultValue": "",
-            "required": true,
-            "helpMarkDown": "The URL of an npm registry not hosted in this account.",
-            "visibleRule": "registryType = custom",
-            "groupName": "registry"
+            "helpMarkDown": "Current working directory where npm command is run.  Defaults to the root of the repo.",
+            "groupName": "advanced"
         }
     ],
     "execution": {
