@@ -11,7 +11,7 @@ function Get-AzureUtility
     $azureUtilityNewVersion = "AzureUtilityGTE1.0.ps1"
 	
 	
-    if( !$currentVersion -and $currentVersion -gt $minimumAzureVersion )
+    if( $currentVersion -and $currentVersion -gt $minimumAzureVersion )
     {
 	    $azureUtilityRequiredVersion = $azureUtilityNewVersion  
     }

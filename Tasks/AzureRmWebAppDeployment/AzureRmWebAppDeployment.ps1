@@ -53,9 +53,8 @@ try{
 
 	# Get msdeploy.exe path
 	$msDeployExePath = Get-MsDeployExePath
-
 	
-	if( $IsAspNet5Website -eq "false")
+	if( !$IsAspNet5Website )
     {
         # Ensure that at most a package (.zip) file is found
         $packageFilePath = Get-SingleFilePath -file $Package
@@ -65,7 +64,7 @@ try{
 
         $packageFilePath  = "$package\wwwroot"
 
-        if( ! ( Test-Path $package -and Test-Path $packageFilePath) )
+        if( ! ( ( Test-Path $package ) -and (Test-Path $packageFilePath) ) )
         {
             throw "$package path doesn't exist"
         }
@@ -87,7 +86,7 @@ try{
 	$webAppNameForMSDeployCmd = Get-WebAppNameForMSDeployCmd -webAppName $WebAppName -deployToSlotFlag $DeployToSlotFlag -slotName $SlotName
 
 	# Construct arguments for msdeploy command
-	if( $IsAspNet5Website -eq "false" )
+	if( !$IsAspNet5Website  )
     {
          $msDeployCmdArgs = Get-MsDeployCmdArgs -packageFile $packageFilePath -webAppNameForMSDeployCmd $webAppNameForMSDeployCmd -azureRMWebAppConnectionDetails $azureRMWebAppConnectionDetails -removeAdditionalFilesFlag $RemoveAdditionalFilesFlag `
                                        -excludeFilesFromAppDataFlag $ExcludeFilesFromAppDataFlag -takeAppOfflineFlag $TakeAppOfflineFlag -virtualApplication $VirtualApplication -AdditionalArguments $AdditionalArguments `
@@ -95,7 +94,7 @@ try{
     }
     else
     {
-         $msDeployCmdArgs = Get-MsDeployAspDotNet5CmdArgs -packageFile $packageFilePath -webAppNameForMSDeployCmd $webAppNameForMSDeployCmd -azureRMWebAppConnectionDetails $azureRMWebAppConnectionDetails -removeAdditionalFilesFlag $RemoveAdditionalFilesFlag `
+         $msDeployCmdArgs = Get-MsDeployAspDotNet5CmdArgs -wwwRootDir $packageFilePath -webAppNameForMSDeployCmd $webAppNameForMSDeployCmd -azureRMWebAppConnectionDetails $azureRMWebAppConnectionDetails -removeAdditionalFilesFlag $RemoveAdditionalFilesFlag `
                                        -excludeFilesFromAppDataFlag $ExcludeFilesFromAppDataFlag -takeAppOfflineFlag $TakeAppOfflineFlag -virtualApplication $VirtualApplication -AdditionalArguments $AdditionalArguments `
                                        -setParametersFile $setParametersFilePath
     }
