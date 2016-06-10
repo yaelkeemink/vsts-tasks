@@ -13,7 +13,7 @@
     "version": {
         "Major": 1,
         "Minor": 0,
-        "Patch": 7
+        "Patch": 10
     },
     "minimumAgentVersion": "1.99.0",
         "groups": [
@@ -31,6 +31,14 @@
             "defaultValue": "",
             "required": true,
             "helpMarkDown": "Select the Azure Resource Manager subscription for the deployment."
+        },
+		{
+            "name": "IsAspNet5Website",
+            "type": "boolean",
+            "label": "Asp.net 5 WebApp",
+            "defaultValue": "false",
+            "required": false,
+            "helpMarkDown": "Select true if deploying Asp.net5 webapp"
         },
         {
             "name": "WebAppName",
