@@ -41,6 +41,7 @@ try{
 	. $PSScriptRoot/AzureUtility.ps1
 	. $PSScriptRoot/Utility.ps1
 	. $PSScriptRoot/FindInstalledMSDeploy.ps1
+    . $PSScriptRoot/CompressionUtility.ps1
 
 	# Importing required version of azure cmdlets according to azureps installed on machine
 	$azureUtility = Get-AzureUtility
@@ -55,6 +56,10 @@ try{
 
 	# Ensure that at most a package (.zip) file is found
 	$packageFilePath = Get-SingleFilePath -file $Package
+
+    if( $SubstituteParamters ){
+        $packageFilePath = Substitute-ConfigurationParameters -PackageFile $packageFilePath
+    }
 
     # Since the SetParametersFile is optional, but it's a FilePath type, it will have the value System.DefaultWorkingDirectory when not specified
     if( $SetParametersFile -eq $env:SYSTEM_DEFAULTWORKINGDIRECTORY -or $SetParametersFile -eq [String]::Concat($env:SYSTEM_DEFAULTWORKINGDIRECTORY, "\" ) -or [string]::IsNullOrEmpty($SetParametersFile) ){
