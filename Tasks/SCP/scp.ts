@@ -107,79 +107,98 @@ function findFilesToCopy(sourceFolder, contents) {
     return files;
 }
 
-function runCommandsUsingSSH(sshConfig, commands) {
-    return Q.fcall(() => {
-        try {
-            var stdout:string = '';
+function runCommandsUsingSSH(sshConfig, commands, callback) {
+    try {
+        var stdout:string = '';
 
-            var client = new SSHClient();
-            client.on('ready', function () {
-                tl.debug('SSH connection succeeded, client is ready.');
-                client.shell(function (err, stream) {
-                    if (err) {
-                        tl._writeError(err);
-                    }
-                    stream.on('close', function () {
+        commands = commands.concat('\nexit\n');
+
+        var client = new SSHClient();
+        client.on('ready', function () {
+            tl.debug('SSH connection succeeded, client is ready.');
+            client.shell(function (err, stream) {
+                if (err) {
+                    tl._writeError(err);
+                    callback(err);
+                }
+                stream.on('close', function () {
+                    tl._writeLine(stdout);
+                    client.end();
+                    callback(null);
+                }).on('data', function (data) {
+                    stdout = stdout.concat(data);
+                    if (stdout.endsWith('\n')) {
                         tl._writeLine(stdout);
-                        client.end();
-                    }).on('data', function (data) {
-                        stdout = stdout.concat(data);
-                        if (stdout.endsWith('\n')) {
-                            tl._writeLine(stdout);
-                            stdout = '';
-                        }
-                    }).stderr.on('data', function (data) {
-                            tl._writeError(data);
-                        });
-                    stream.end(commands);
-                    return Q(0);
-                });
-            }).on('error', function (err) {
-                return Q('Failed to connect to remote machine. Verify the SSH endpoint details. Error: '  + err);
-            }).connect(sshConfig);
-        } catch(err) {
-            return Q('Failed to connect to remote machine. Verify the SSH endpoint details. Error: ' + err);
-        }
-    })
+                        stdout = '';
+                    }
+                }).stderr.on('data', function (data) {
+                        tl._writeError(data);
+                        callback(data);
+                    });
+                stream.end(commands);
+                callback(null);
+            });
+        }).on('error', function (err) {
+            callback('Failed to connect to remote machine. Verify the SSH endpoint details. Error: '  + err);
+
+        }).connect(sshConfig);
+    } catch(err) {
+        callback('Failed to connect to remote machine. Verify the SSH endpoint details. Error: ' + err);
+    }
 }
 
-function cleanTargetFolderSSH(sshConfig, targetFolder) {
-    runCommandsUsingSSH(sshConfig, 'rm -rf ' + targetFolder)
-    .then(() => {
-            tl.debug('Cleaned up folder on remote machine: ' + targetFolder)
-        })
-    .fail((err) => {
-            tl.setResult(tl.TaskResult.Failed, 'Failed to clean up folder on remote machine: ' + err);
-        })
-    tl.debug('return from cleanTargetFolderSSH');
+function cleanTargetFolderSSH(sshConfig, targetFolder, clean, callback){
+    if(clean) {
+        targetFolder = '\'' + targetFolder + '\''; //handle case where targetFolder might have white spaces
+        var deleteCmd = 'rm -rf ' + targetFolder;
+        tl.debug('deleteCmd = ' + deleteCmd);
+        return runCommandsUsingSSH(sshConfig, deleteCmd, function(err) {
+            callback(err);
+        });
+    } else {
+        tl.debug('Skip cleaning the target folder');
+        callback(null);
+    }
 }
 
-function createTargetFolderSSH(sshConfig, targetFolder) {
-    runCommandsUsingSSH(sshConfig, 'mkdir ' + targetFolder)
-        .then(() => {
-            tl.debug('Created folder on remote machine: ' + targetFolder)
-        })
-        .fail((err) => {
-            tl.setResult(tl.TaskResult.Failed, 'Failed to create folder on remote machine: ' + err);
-        })
-    tl.debug('return from createTargetFolderSSH');
+function createTargetFolderSSH(sshConfig, targetFolder, callback) {
+    targetFolder = '\'' + targetFolder + '\''; //handle case where targetFolder might have white spaces
+    var mkDirCmd = 'if [ ! -d ' + targetFolder + ' ]; then mkdir -p ' + targetFolder + '; fi';
+    tl.debug('mkDirCmd = ' + mkDirCmd);
+    runCommandsUsingSSH(sshConfig, mkDirCmd, function(err) {
+        callback(err);
+    });
 }
 
-function scpFile(sshConfig, file, targetFolder) {
+function scpFile(sshConfig, file, callback) {
     var scpConfig = sshConfig;
-    scpConfig.path = targetFolder;
-    tl.debug('scp config = ' + scpConfig);
-    scp2Client.scp(file, scpConfig, function (err) {
-        if (err) {
-            return Q(err);
-        }
-        return Q(0);
-    }).then(() => {
-        tl.debug('Copied ' + file + ' successfully to ' + targetFolder + ' on remote machine.');
+    tl.debug('file = ' + file);
+    var relativePath = file.substring(sourceFolder.length)
+        .replace(/^\\/g, "")
+        .replace(/^\//g, "");
+    tl.debug('relative path = ' + relativePath);
 
-    }).fail((err) => {
-        tl.debug('Copy file failed ' + err);
-    })
+    var targetPath = path.join(targetFolder, relativePath)
+        .replace(/\\/g, '/');
+    tl.debug('target path = ' + targetPath);
+
+    var targetDir = path.dirname(targetPath)
+        .replace(/\\/g, '/');
+    tl.debug('target dir = ' + targetDir);
+
+    createTargetFolderSSH(sshConfig, targetDir, function (err) {
+        if(err) {
+            callback(err);
+        } else {
+            scpConfig.path = targetDir;
+            tl.debug('scp file ' + file + ' to path on remote = ' + scpConfig.path);
+            scp2Client.scp(file, scpConfig, function (err) {
+                callback(err);
+            });
+        }
+    });
+
+
 }
 
 var sshEndpoint = tl.getInput('sshEndpoint', true);
@@ -197,7 +216,7 @@ if(!port || port === '') {
 // contents is a multiline input containing glob patterns
 var contents: string[] = tl.getDelimitedInput('contents', '\n', true);
 var sourceFolder: string = tl.getPathInput('sourceFolder', true, true);
-var targetFolder: string = tl.getPathInput('targetFolder', true);
+var targetFolder: string = tl.getInput('targetFolder', true);
 
 var cleanTargetFolder: boolean = tl.getBoolInput('cleanTargetFolder', false);
 var overwrite: boolean = tl.getBoolInput('overwrite', false);
@@ -210,8 +229,7 @@ if (privateKey && privateKey !== '') {
         port: port,
         username: username,
         privateKey: privateKey,
-        passphrase: password,
-        path: targetFolder
+        passphrase: password
     }
 } else {
     tl.debug('Using password for connecting.');
@@ -219,51 +237,39 @@ if (privateKey && privateKey !== '') {
         host: hostname,
         port: port,
         username: username,
-        password: password,
-        path: targetFolder
+        password: password
     }
 }
 
 var files = findFilesToCopy(sourceFolder, contents);
-console.log(tl.loc('FoundNFiles', files.length));
+console.log('Found ' + files.length + ' files');
 
 // copy the files to the target folder
 if (files.length > 0) {
-    // dump all files to debug trace.
-    files.forEach((file: string) => {
-        tl.debug('file:' + file + ' will be copied.');
-    })
-
-    // clean target folder if required
-    if (cleanTargetFolder) {
-        console.log(tl.loc('CleaningTargetFolder', targetFolder));
-        cleanTargetFolderSSH(sshConfig, targetFolder);
-    }
-
-    // make sure the target folder exists
-    createTargetFolderSSH(sshConfig, targetFolder);
-
-    var commonRoot: string = "";
-    try {
-        var createdFolders = {};
-        files.forEach((file: string) => {
-            var relativePath = file.substring(sourceFolder.length)
-                .replace(/^\\/g, "")
-                .replace(/^\//g, "");
-
-            var targetPath = path.join(targetFolder, relativePath);
-            var targetDir = path.dirname(targetPath);
-
-            if (!createdFolders[targetDir]) {
-                tl.debug("Creating folder " + targetDir);
-                createTargetFolderSSH(sshConfig, targetDir);
-                createdFolders[targetDir] = true;
-            }
-
-            scpFile(sshConfig, file, targetDir);
-        });
-    }
-    catch (err) {
-        tl.setResult(tl.TaskResult.Failed, err);
-    }
+    //if required clean the target folder
+    cleanTargetFolderSSH(sshConfig, targetFolder, cleanTargetFolder, function(err) {
+        if(err) {
+            tl.setResult(tl.TaskResult.Failed, 'Failed to clean target folder on remote machine');
+        } else {
+            // make sure the target folder exists
+            createTargetFolderSSH(sshConfig, targetFolder, function(err) {
+                if(err) {
+                    tl.setResult(tl.TaskResult.Failed, 'Failed to create target folder on remote machine');
+                } else {
+                    try {
+                        files.forEach((file:string) => {
+                            scpFile(sshConfig, file, function(err) {
+                                if(err) {
+                                    throw err;
+                                }
+                            });
+                        });
+                    }
+                    catch (err) {
+                        tl.setResult(tl.TaskResult.Failed, err);
+                    }
+                }
+            })
+        }
+    });
 }

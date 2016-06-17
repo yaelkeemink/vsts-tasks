@@ -56,7 +56,7 @@
       "label": "Target Folder",
       "defaultValue": "",
       "required": true,
-      "helpMarkDown": "Target folder on remote machine files will be copied to. Example: /home/user/MySite"
+      "helpMarkDown": "Target folder on remote machine where files will be copied to. Example: /home/user/MySite"
     },
     {
       "name": "cleanTargetFolder",
