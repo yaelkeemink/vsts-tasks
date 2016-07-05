@@ -1,4 +1,4 @@
-﻿{
+{
     "id": "CE85A08B-A538-4D2B-8589-1D37A9AB970F",
     "name": "SqlAzureDacpacDeployment",
     "friendlyName": "Azure SQL Database Deployment",
@@ -13,7 +13,7 @@
     "version": {
         "Major": 1,
         "Minor": 0,
-        "Patch": 21
+        "Patch": 20
     },
     "demands": [
         "azureps",
@@ -105,7 +105,7 @@
             "required": false,
             "groupName": "target",
             "defaultValue": "",
-            "helpMarkDown": "Password for the Azure SQL Server administrator.<br>It can accept variable defined in Build/Release Definitions as '$(passwordVariable').<br>You may mark variable type as 'secret' to secure it."
+            "helpMarkDown": "Password for the Azure SQL Server administrator."
         },
         {
             "name": "PublishProfile",

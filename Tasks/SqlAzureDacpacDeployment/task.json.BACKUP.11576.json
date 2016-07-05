@@ -1,4 +1,4 @@
-﻿{
+{
     "id": "CE85A08B-A538-4D2B-8589-1D37A9AB970F",
     "name": "SqlAzureDacpacDeployment",
     "friendlyName": "Azure SQL Database Deployment",
@@ -13,7 +13,11 @@
     "version": {
         "Major": 1,
         "Minor": 0,
+<<<<<<< HEAD
+        "Patch": 20
+=======
         "Patch": 21
+>>>>>>> 727a4d508c721e057fd74beb249b87f8429bc5f3
     },
     "demands": [
         "azureps",
