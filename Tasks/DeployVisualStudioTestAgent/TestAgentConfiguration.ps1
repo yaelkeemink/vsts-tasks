@@ -328,9 +328,22 @@ function Set-TestAgentConfiguration
         }
     }    
 
+    $configLogFile = Join-Path $env:temp testagentconfiguration.log
+    if(Test-path -Path $configLogFile) 
+    {
+        Remove-Item $configLogFile -ErrorAction SilentlyContinue
+    }
+
     DeleteDTAAgentExecutionService -ServiceName "DTAAgentExecutionService" | Out-Null
 
     $configOut = InvokeTestAgentConfigExe -Arguments $configArgs -Version $TestAgentVersion -UserCredential $MachineUserCredential
+
+    if(Test-path -Path $configLogFile) 
+    {
+        Write-Verbose "=== Starting to print the testagent configuration log file ==="
+        Get-Content $configLogFile | foreach { Write-Verbose $_ }
+        Write-Verbose "=== Done printing the testagent configuration log file ==="        
+    }
 
     if ($configOut.ExitCode -ne 0 -and $configOut.ExitCode -ne 3010)
     {
@@ -703,15 +716,16 @@ function EnableTracing
         {
             $programFilesPath = ${env:ProgramFiles}
         }
-        $configFilePath = "$programFilesPath\Microsoft Visual Studio " + $TestAgentVersion + "\Common7\Ide"
+        $configFilePath = Join-Path "$programFilesPath" "Microsoft Visual Studio $TestAgentVersion" "Common7" "Ide"
     }    
 
-    $logFilePath = "$env:SystemDrive\DtaLogs"
+    $logFilePath = Join-Path "$env:SystemDrive" "DtaLogs"
     $dtaExecutable = "DTAExecutionHost"
+    $dtaExecutableLogFilePath = Join-Path $logFilePath "$dtaExecutable.exe.log"
     $traceLevel = 4
 
     # Add listener and modify trace level
-    $file = "$configFilePath\" + $dtaExecutable + ".exe.config"
+    $file = Join-Path "$configFilePath" "$dtaExecutable.exe.log"
     Write-Verbose -Message ("Trying to open the config file : {0}" -f $file) -Verbose
 
     [xml]$configFile = Get-Content -Path $file
@@ -721,8 +735,8 @@ function EnableTracing
             <listeners>
             <add name="autoListener"
                 type="System.Diagnostics.TextWriterTraceListener"
-                initializeData="{0}\{1}.exe.log" />
-            </listeners>' -f $logFilePath, $dtaExecutable
+                initializeData="{0}" />
+            </listeners>' -f $dtaExecutableLogFilePath
 
     $exists = $false
 
