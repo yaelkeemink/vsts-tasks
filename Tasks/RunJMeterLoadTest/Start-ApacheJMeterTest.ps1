@@ -29,7 +29,9 @@ $global:ThresholdExceeded = $false
 $global:RestTimeout = 5
 $global:MonitorThresholds = $false
 $global:ElsAccountUrl = "http://www.visualstudio.com"
+$global:TFSAccountUrl = "http://www.visualstudio.com"
 $global:ScopedTestDrop = $TestDrop
+$global:ThresholdsViolationCount = 0
 
 function InitializeRestHeaders()
 {
@@ -134,6 +136,7 @@ function PrintErrorSummary($headers, $run)
                     if ($type.typeName -eq "ThresholdMessage")
                     {
                         Write-Warning ( "[{0}] {1} occurrences of {2} " -f $type.typeName, $errorDetail.occurrences, $errorDetail.messageText)
+                        $global:ThresholdsViolationCount += $errorDetail.occurrences
                     }
                     else
                     {
@@ -334,6 +337,20 @@ function UploadSummaryMdReport($summaryMdPath)
 	}
 }
 
+function GetLastSuccessfultBuild($headers)
+{
+    $uri = ("{0}/{1}/_apis/build/builds?api-version={2}&definitions={3}&statusFilter=completed&resultFilter=succeeded&`$top=1" -f $global:TFSAccountUrl, $env:System_TeamProjectId, '2.0', $env:SYSTEM_DEFINITIONID)
+    $previousBuild = Get $headers $uri
+    return $previousBuild.Value
+}
+
+function GetFilteredTestRuns($headers, $filter)
+{
+    $uri = ("{0}/_apis/clt/testruns?{1}&detailed=false&runType=JMeterLoadTest&{2}" -f $global:ElsAccountUrl, $apiVersion, $filter)
+    $filteredTestRuns = Get $headers $uri
+    return $filteredTestRuns
+}
+
 
 ############################################## PS Script execution starts here ##########################################
 WriteTaskMessages "Starting Load Test Script"
@@ -361,11 +378,10 @@ $connectedServiceDetails = Get-ServiceEndpoint -Context $distributedTaskContext 
 $Username = $connectedServiceDetails.Authorization.Parameters.Username
 Write-Verbose "Username = $userName" -Verbose
 $Password = $connectedServiceDetails.Authorization.Parameters.Password
-$global:ElsAccountUrl = ComposeAccountUrl($connectedServiceDetails.Url.AbsoluteUri)
+$global:ElsAccountUrl = ComposeAccountUrl($connectedServiceDetails.Url.AbsoluteUri).TrimEnd('/')
+$global:TFSAccountUrl = $env:System_TeamFoundationCollectionUri.TrimEnd('/')
 
-$tfsUrl = $env:System_TeamFoundationCollectionUri.TrimEnd('/')
-
-Write-Verbose "VSO account Url = $tfsUrl" -Verbose
+Write-Verbose "VSO account Url = $global:TFSAccountUrl" -Verbose
 Write-Verbose "CLT account Url = $global:ElsAccountUrl" -Verbose
 
 #Setting Headers and account Url accordingly
@@ -410,15 +426,66 @@ if ($drop.dropType -eq "TestServiceBlobDrop")
     }
 
     Write-Output ("Run-id for this load test is {0} and its name is '{1}'." -f  $run.runNumber, $run.name)
-    Write-Output ("To view run details navigate to {0}/_apps/hub/ms.vss-cloudloadtest-web.hub-loadtest-account?_a=summary&runId={1}" -f $tfsUrl, $run.id)
+    Write-Output ("To view run details navigate to {0}/_apps/hub/ms.vss-cloudloadtest-web.hub-loadtest-account?_a=summary&runId={1}" -f $global:TFSAccountUrl, $run.id)
 
     $resultsMDFolder = New-Item -ItemType Directory -Force -Path "$env:Temp\LoadTestResultSummary"
     $resultFilePattern = ("ApacheJMeterTestResults_{0}_{1}_*.md" -f $env:AGENT_ID, $env:SYSTEM_DEFINITIONID)
     $excludeFilePattern = ("ApacheJMeterTestResults_{0}_{1}_{2}_*.md" -f $env:AGENT_ID, $env:SYSTEM_DEFINITIONID, $env:BUILD_BUILDID)
     Remove-Item $resultsMDFolder\$resultFilePattern -Exclude $excludeFilePattern -Force
     $summaryFile =  ("{0}\ApacheJMeterTestResults_{1}_{2}_{3}_{4}.md" -f $resultsMDFolder, $env:AGENT_ID, $env:SYSTEM_DEFINITIONID, $env:BUILD_BUILDID, $run.id)
+	
+	if ($global:ThresholdExceeded -eq $true)
+	{
+        $thresholdMessage=("{0} thresholds violated." -f $global:ThresholdsViolationCount)
+        $thresholdImage="glyph-error"
+	}
+	elseif ($global:ThresholdsViolationCount -gt 1)
+	{
+        $thresholdMessage=("{0} thresholds violated." -f $global:ThresholdsViolationCount)
+        $thresholdImage="glyph-warning"
+	}
+	elseif ($global:ThresholdsViolationCount -eq 1)
+	{
+        $thresholdMessage=("{0} threshold violated." -f $global:ThresholdsViolationCount)
+        $thresholdImage="glyph-warning"
+	}
+	else
+    {
+        $thresholdMessage="No thresholds violated."
+        $thresholdImage="glyph-success"
+	}
+	
+    ('|||') >>  $summaryFile
+    ('| --- | --- |') >>  $summaryFile
+    ('| | |') >>  $summaryFile
+    ('| [Test Run: {0}]({2}/_apps/hub/ms.vss-cloudloadtest-web.hub-loadtest-account?_a=summary&runId={3}) using {1}. | <img src="/_static/content/notifications/{4}.png" width=15px height=15px hspace=5px/> {5}|' -f  $run.runNumber, $run.name, $global:TFSAccountUrl, $run.id, $thresholdImage, $thresholdMessage) >>  $summaryFile
+    
+    $runComparisonAvailable = $false
+    $lastSuccessfulBuild = GetLastSuccessfultBuild $headers
+	
+	if ($lastSuccessfulBuild)
+	{
+        $runSourceIdentifierFilter=('runsourceidentifier=build/{0}/{1}' -f $env:SYSTEM_DEFINITIONID, $lastSuccessfulBuild.id)
+        $runsInLastBuild = GetFilteredTestRuns $headers $runSourceIdentifierFilter
+        
+        if ($runsInLastBuild)
+        {
+            foreach ($previousRun in $runsInLastBuild)
+            {
+                if ($previousRun.name -eq $run.name)
+                {
+                    $runComparisonAvailable = $true
+                    ('| [Compare with run {4} from build {0}]({1}/_apps/hub/ms.vss-cloudloadtest-web.hub-loadtest-account?_a=compare&runId1={2}&runId2={3}). | |' -f  $lastSuccessfulBuild.id, $global:TFSAccountUrl, $previousRun.id, $run.id, $previousRun.runNumber) >>  $summaryFile
+                    break
+                }
+            }
+        }           
+	}
 
-    ("<p>[Test Run: {0}]({2}/_apps/hub/ms.vss-cloudloadtest-web.hub-loadtest-account?_a=summary&runId={3}) using {1}.</p>" -f  $run.runNumber, $run.name, $tfsUrl, $run.id) >>  $summaryFile
+	if(!$runComparisonAvailable)
+	{
+        ('| No previous run found for comparison. | |') >>  $summaryFile
+	}   
 	
     UploadSummaryMdReport $summaryFile
 }
