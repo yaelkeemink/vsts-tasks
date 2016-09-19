@@ -387,7 +387,7 @@ describe('AzureRmWebAppDeployment Suite', function() {
         tr.setInput('WebAppName', 'mytestapp');
         tr.setInput('Package', 'webAppPkg.zip');
         tr.setInput('UseWebDeploy', 'false');
-        shell.cp("-f", path.join (testSrcPath,'kuduUtilityBad.js'), path.join (__dirname, '..', '..', 'Temp', 'AzureRmWebAppDeployment', 'kuduUtility.js'));
+        shell.cp("-f", path.join (testSrcPath,'kuduutilitybad.js'), path.join (__dirname, '..', '..', 'Temp', 'AzureRmWebAppDeployment', 'kuduutility.js'));
         tr.run()
             .then(() => {
 
@@ -415,7 +415,7 @@ describe('AzureRmWebAppDeployment Suite', function() {
         tr.setInput('Package', 'webAppPkg');
         tr.setInput('UseWebDeploy', 'false');
 
-        shell.cp("-f", path.join (testSrcPath,'kuduUtilityBad.js'), path.join (__dirname, '..', '..', 'Temp', 'AzureRmWebAppDeployment', 'kuduUtility.js'));
+        shell.cp("-f", path.join (testSrcPath,'kuduutilitybad.js'), path.join (__dirname, '..', '..', 'Temp', 'AzureRmWebAppDeployment', 'kuduutility.js'));
         tr.run()
             .then(() => {
 
