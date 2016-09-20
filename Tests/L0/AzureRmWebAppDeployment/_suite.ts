@@ -48,7 +48,7 @@ describe('AzureRmWebAppDeployment Suite', function() {
     
     it('Runs successfully with default inputs', (done) => {
         
-        setResponseFile('armGood.json');
+        setResponseFile('armgood.json');
 
         var tr = new trm.TaskRunner('AzureRmWebAppDeployment');
         tr.setInput('ConnectedServiceName', 'AzureRMSpn');
@@ -74,7 +74,7 @@ describe('AzureRmWebAppDeployment Suite', function() {
 
     it('Runs successfully with all other inputs', (done) => {
         
-        setResponseFile('armGood.json');
+        setResponseFile('armgood.json');
 
         var tr = new trm.TaskRunner('AzureRmWebAppDeployment');
         tr.setInput('ConnectedServiceName', 'AzureRMSpn');
@@ -106,7 +106,7 @@ describe('AzureRmWebAppDeployment Suite', function() {
 
     it('Runs successfully with default inputs for deployment to specific slot', (done) => {
         
-        setResponseFile('armGood.json');
+        setResponseFile('armgood.json');
 
         var tr = new trm.TaskRunner('AzureRmWebAppDeployment');
         tr.setInput('ConnectedServiceName', 'AzureRMSpn');
@@ -135,7 +135,7 @@ describe('AzureRmWebAppDeployment Suite', function() {
     
     it('Fails if msdeploy cmd fails to execute', (done) => {
         
-        setResponseFile('armBad.json');
+        setResponseFile('armbad.json');
 
         var tr = new trm.TaskRunner('AzureRmWebAppDeployment');
         tr.setInput('ConnectedServiceName', 'AzureRMSpn');
@@ -163,7 +163,7 @@ describe('AzureRmWebAppDeployment Suite', function() {
 
     it('Runs successfully with parameter file present in package', (done) => {
         
-        setResponseFile('armGoodWithParamFile.json');
+        setResponseFile('armgoodwithparamfile.json');
 
         var tr = new trm.TaskRunner('AzureRmWebAppDeployment');
         tr.setInput('ConnectedServiceName', 'AzureRMSpn');
@@ -190,7 +190,7 @@ describe('AzureRmWebAppDeployment Suite', function() {
 
     it('Runs successfully with parameter file present in package on non-windows', (done) => {
         
-        setResponseFile('armGoodWithParamFileNonWindows.json');
+        setResponseFile('armgoodwithparamfilenonwindows.json');
 
         var tr = new trm.TaskRunner('AzureRmWebAppDeployment');
         tr.setInput('ConnectedServiceName', 'AzureRMSpn');
@@ -219,7 +219,7 @@ describe('AzureRmWebAppDeployment Suite', function() {
 
     it('Runs successfully with parameter file provided by user on windows', (done) => {
         
-        setResponseFile('armGoodWithParamFile.json');
+        setResponseFile('armgoodwithparamFile.json');
 
         var tr = new trm.TaskRunner('AzureRmWebAppDeployment');
         tr.setInput('ConnectedServiceName', 'AzureRMSpn');
@@ -246,7 +246,7 @@ describe('AzureRmWebAppDeployment Suite', function() {
     
     it('Fails if parameters file provided by user is not present', (done) => {
         
-        setResponseFile('armGoodWithParamFile.json');
+        setResponseFile('armgoodwithparamfile.json');
 
         var tr = new trm.TaskRunner('AzureRmWebAppDeployment');
         tr.setInput('ConnectedServiceName', 'AzureRMSpn');
@@ -273,7 +273,7 @@ describe('AzureRmWebAppDeployment Suite', function() {
     
     it('Fails if more than one package matched with specified pattern', (done) => {
         
-        setResponseFile('armGood.json');
+        setResponseFile('armgood.json');
 
         var tr = new trm.TaskRunner('AzureRmWebAppDeployment');
         tr.setInput('ConnectedServiceName', 'AzureRMSpn');
@@ -300,7 +300,7 @@ describe('AzureRmWebAppDeployment Suite', function() {
     
     it('Fails if package or folder name is invalid', (done) => {
         
-        setResponseFile('armGood.json');
+        setResponseFile('armgood.json');
 
         var tr = new trm.TaskRunner('AzureRmWebAppDeployment');
         tr.setInput('ConnectedServiceName', 'AzureRMSpn');
@@ -326,7 +326,7 @@ describe('AzureRmWebAppDeployment Suite', function() {
 
     it('Runs successfully with Folder Deployment', (done) => {
         
-        setResponseFile('armGood.json');
+        setResponseFile('armgood.json');
 
         var tr = new trm.TaskRunner('AzureRmWebAppDeployment');
         tr.setInput('ConnectedServiceName', 'AzureRMSpn');
@@ -350,7 +350,7 @@ describe('AzureRmWebAppDeployment Suite', function() {
 
     it('Runs KuduDeploy successfully with default inputs on non-windows agent', (done) => {
         
-        setResponseFile('armGoodNonWindows.json');
+        setResponseFile('armgoodnonwindows.json');
 
         var tr = new trm.TaskRunner('AzureRmWebAppDeployment');
         tr.setInput('ConnectedServiceName', 'AzureRMSpn');
@@ -378,7 +378,7 @@ describe('AzureRmWebAppDeployment Suite', function() {
 
     it('Runs KuduDeploy successfully with folder archiving on non-windows agent', (done) => {
         
-        setResponseFile('armGoodNonWindows.json');
+        setResponseFile('armgoodnonwindows.json');
 
         var tr = new trm.TaskRunner('AzureRmWebAppDeployment');
         tr.setInput('ConnectedServiceName', 'AzureRMSpn');
@@ -407,7 +407,7 @@ describe('AzureRmWebAppDeployment Suite', function() {
     });
     it('Fails KuduDeploy if parameter file is present in package', (done) => {
 
-        setResponseFile('armGoodNonWindows.json');
+        setResponseFile('armgoodnonwindows.json');
 
         var tr = new trm.TaskRunner('AzureRmWebAppDeployment');
         tr.setInput('ConnectedServiceName', 'AzureRMSpn');
@@ -434,7 +434,7 @@ describe('AzureRmWebAppDeployment Suite', function() {
     });
     it('Fails KuduDeploy if folder archiving fails', (done) => {
            
-        setResponseFile('armGoodNonWindows.json');
+        setResponseFile('armgoodnonwindows.json');
 
         var tr = new trm.TaskRunner('AzureRmWebAppDeployment');
         tr.setInput('ConnectedServiceName', 'AzureRMSpn');
