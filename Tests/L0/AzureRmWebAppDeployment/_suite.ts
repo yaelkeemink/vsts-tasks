@@ -23,14 +23,14 @@ describe('AzureRmWebAppDeployment Suite', function() {
         if(shell.test ('-d', taskSrcPath)) {
              
             // Move mocked AzureRMUtil, MSDeployUtility and KuduUtility Libraries to task's test location
-            shell.mv( '-f', path.join (taskSrcPath,'AzureRMUtil.js'), path.join (taskSrcPath,'AzureRMUtil_backup.js'));
-            shell.cp(path.join (testSrcPath, 'AzureRMUtil.js'), path.join (taskSrcPath,'AzureRMUtil.js'));
+            shell.mv( '-f', path.join (taskSrcPath,'azurermutil.js'), path.join (taskSrcPath,'azurermutil_backup.js'));
+            shell.cp(path.join (testSrcPath, 'azurermutil.js'), path.join (taskSrcPath,'azurermutil.js'));
 
-            shell.mv( '-f', path.join (taskSrcPath,'MSDeployUtility.js'), path.join (taskSrcPath,'MSDeployUtility_backup.js'));
-            shell.cp(path.join (testSrcPath, 'MSDeployUtility.js'), path.join (taskSrcPath,'MSDeployUtility.js'));
+            shell.mv( '-f', path.join (taskSrcPath,'msdeployutility.js'), path.join (taskSrcPath,'msdeployutility_backup.js'));
+            shell.cp(path.join (testSrcPath, 'msdeployutility.js'), path.join (taskSrcPath,'msdeployutility.js'));
 
-            shell.mv( '-f', path.join (taskSrcPath,'kuduUtility.js'), path.join (taskSrcPath,'kuduUtility_backup.js'));
-            shell.cp(path.join (testSrcPath, 'kuduUtility.js'), path.join (taskSrcPath,'kuduUtility.js'));
+            shell.mv( '-f', path.join (taskSrcPath,'kuduutility.js'), path.join (taskSrcPath,'kuduutility_backup.js'));
+            shell.cp(path.join (testSrcPath, 'kuduutility.js'), path.join (taskSrcPath,'kuduutility.js'));
 
         }
         
@@ -40,9 +40,9 @@ describe('AzureRmWebAppDeployment Suite', function() {
     after(function() {
 
         // Restore the original libraries
-        shell.mv('-f', path.join (taskSrcPath, 'AzureRMUtil_backup.js'), path.join (taskSrcPath,'AzureRMUtil.js'));
-        shell.mv('-f', path.join (taskSrcPath, 'MSDeployUtility_backup.js'), path.join (taskSrcPath,'MSDeployUtility.js'));
-        shell.mv('-f', path.join (taskSrcPath, 'kuduUtility_backup.js'), path.join (taskSrcPath,'kuduUtility.js'));
+        shell.mv('-f', path.join (taskSrcPath, 'azurermutil_backup.js'), path.join (taskSrcPath,'azurermutil.js'));
+        shell.mv('-f', path.join (taskSrcPath, 'msdeployutility_backup.js'), path.join (taskSrcPath,'msdeployutility.js'));
+        shell.mv('-f', path.join (taskSrcPath, 'kuduutility_backup.js'), path.join (taskSrcPath,'kuduutility.js'));
 
     });
     
@@ -414,7 +414,7 @@ describe('AzureRmWebAppDeployment Suite', function() {
         tr.setInput('WebAppName', 'mytestapp');
         tr.setInput('Package', 'webAppPkg.zip');
         tr.setInput('UseWebDeploy', 'false');
-        shell.cp("-f", path.join (testSrcPath,'kuduUtilityBad.js'), path.join (__dirname, '..', '..', 'Temp', 'AzureRmWebAppDeployment', 'kuduUtility.js'));
+        shell.cp("-f", path.join (testSrcPath,'kuduutilitybad.js'), path.join (__dirname, '..', '..', 'Temp', 'AzureRmWebAppDeployment', 'kuduutility.js'));
         tr.run()
             .then(() => {
 
@@ -442,7 +442,7 @@ describe('AzureRmWebAppDeployment Suite', function() {
         tr.setInput('Package', 'webAppPkg');
         tr.setInput('UseWebDeploy', 'false');
 
-        shell.cp("-f", path.join (testSrcPath,'kuduUtilityBad.js'), path.join (__dirname, '..', '..', 'Temp', 'AzureRmWebAppDeployment', 'kuduUtility.js'));
+        shell.cp("-f", path.join (testSrcPath,'kuduutilitybad.js'), path.join (__dirname, '..', '..', 'Temp', 'AzureRmWebAppDeployment', 'kuduutility.js'));
         tr.run()
             .then(() => {
 
