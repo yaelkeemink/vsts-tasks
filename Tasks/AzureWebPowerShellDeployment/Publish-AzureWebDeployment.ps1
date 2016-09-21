@@ -197,4 +197,7 @@ try{
 
 } finally {
     Trace-VstsLeavingInvocation $MyInvocation
+    if($publishAzureWebsiteError) {
+        throw (Get-VstsLocString -Key "FailedtodeployWebsiteError0" -ArgumentList $publishAzureWebsiteError)
+    }
 }
