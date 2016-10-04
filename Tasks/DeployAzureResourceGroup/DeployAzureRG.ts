@@ -6,6 +6,7 @@ import path = require("path");
 import tl = require("vsts-task-lib/task");
 import fs = require("fs");
 import util = require("util");
+import os = require("os");
 
 var msRestAzure = require("ms-rest-azure");
 var asmSchedule = require("azure-asm-scheduler");
@@ -21,6 +22,8 @@ catch (err) {
     tl.setResult(tl.TaskResult.Failed, tl.loc("TaskNotFound", err));
     process.exit();
 }
+
+var TEMP_DIR:string = os.tmpdir();
 
 export class AzureResourceGroupDeployment {
 
@@ -40,7 +43,8 @@ export class AzureResourceGroupDeployment {
     private connectedService:string;
     private isLoggedIn:boolean = false;
     private deploymentMode:string;
-    
+    private credentials;
+
     constructor() {
         try { 
             this.connectedServiceNameSelector = tl.getInput("ConnectedServiceNameSelector", true);
@@ -71,27 +75,34 @@ export class AzureResourceGroupDeployment {
             tl.setResult(tl.TaskResult.Failed, tl.loc("ARGD_ConstructorFailed", error.message));
         }
     }
-
-    public execute() {
+    
+    public execute() { 
+        try {
+            this.credentials = this.getAzureCredentials();
+        } catch(error) {
+            tl.setResult(tl.TaskResult.Failed, "Error while validating credentials : " + error);
+            return;
+        }
+        
         if (this.connectedServiceNameSelector === "ConnectedServiceName") {
             switch (this.action) {
                 case "Create Or Update Resource Group":
                 case "DeleteRG":
                 case "Select Resource Group":
-                    new resourceGroup.ResourceGroup(this.action, this.connectedService, this.getARMCredentials(), this.resourceGroupName, this.location, this.csmFile, this.csmParametersFile, this.overrideParameters, this.subscriptionId, this.deploymentMode, this.outputVariable);
+                    new resourceGroup.ResourceGroup(this.action, this.connectedService, this.credentials, this.resourceGroupName, this.location, this.csmFile, this.csmParametersFile, this.overrideParameters, this.subscriptionId, this.deploymentMode, this.outputVariable);
                     break;
                 case "Start":
                 case "Stop":
                 case "Restart":
                 case "Delete":
-                    new virtualMachine.VirtualMachine(this.resourceGroupName, this.action, this.subscriptionId, this.connectedService, this.getARMCredentials());
+                    new virtualMachine.VirtualMachine(this.resourceGroupName, this.action, this.subscriptionId, this.connectedService, this.credentials);
                     break;
                 default:
                     tl.setResult(tl.TaskResult.Succeeded, tl.loc("InvalidAction"));
             }
-            if (this.outputVariable && this.outputVariable.trim() != "" && this.action != "Select Resource Group" && this.action != "Select Cloud Service") {
+            if (this.outputVariable && this.outputVariable.trim() != "" && this.action != "Select Resource Group") {
                 try {
-                    new env.RegisterEnvironment(this.getARMCredentials(), this.subscriptionId, this.resourceGroupName, this.outputVariable);
+                    new env.RegisterEnvironment(this.getAzureCredentials(), this.subscriptionId, this.resourceGroupName, this.outputVariable);
                 }
                 catch (error) {
                     tl.setResult(tl.TaskResult.Failed, tl.loc("FailedRegisteringEnvironment", error));
@@ -100,18 +111,36 @@ export class AzureResourceGroupDeployment {
         }
     }
 
-    private createPublishSettingsFile(certificate:string, publishSettingsFile:string) {
-        var contents = util.format('<?xml version="1.0" encoding="utf-8"?><PublishData><PublishProfile SchemaVersion="2.0" PublishMethod="AzureServiceManagementAPI"><Subscription ServiceManagementUrl="https://management.core.windows.net" Id="%s" Name="%s" ManagementCertificate="%s" /> </PublishProfile></PublishData>', this.subscriptionId, tl.getEndpointDataParameter(this.connectedService, "SubscriptionName", true), certificate);
-        try {
-            fs.writeFileSync(publishSettingsFile, contents);
+    private writeFile(fileName:string, contents:string) {
+        if (fs.existsSync(fileName)) {
+            fs.unlinkSync(fileName);
         }
-        catch(err) {
-           fs.unlinkSync(publishSettingsFile);
-           tl.setResult(tl.TaskResult.Failed, "Failed while creating temparory publish Settings file " + err);
+        fs.writeFileSync(fileName, contents);
+    } 
+
+    private deleteFile(fileName:string) {
+        if (fs.existsSync(fileName)) {
+            fs.unlinkSync(fileName);
         }
     }
-     private getARMCredentials() {
+
+    private createPublishSettingsFile(certificate:string, publishSettingsFile:string) {
+        var contents = util.format(`<?xml version="1.0" encoding="utf-8"?>
+                                    <PublishData><PublishProfile SchemaVersion="2.0" PublishMethod="AzureServiceManagementAPI">
+                                    <Subscription ServiceManagementUrl="https://management.core.windows.net" Id="%s" Name="%s" ManagementCertificate="%s" /> 
+                                    </PublishProfile></PublishData>`, this.subscriptionId, tl.getEndpointDataParameter(this.connectedService, "SubscriptionName", true), certificate);
+        try {
+            this.writeFile(publishSettingsFile, contents);
+        }
+        catch(err) {
+           this.deleteFile(publishSettingsFile);
+           tl.setResult(tl.TaskResult.Failed, "Failed while creating temporary publish Settings file " + err);
+        }
+    }
+
+    private getAzureCredentials() {
         var endpointAuth = tl.getEndpointAuthorization(this.connectedService, true);
+        // Azure Resource Manager
         if (this.connectedServiceNameSelector === "ConnectedServiceName") {
             var servicePrincipalId:string = endpointAuth.parameters["serviceprincipalid"];
             var servicePrincipalKey:string = endpointAuth.parameters["serviceprincipalkey"];
@@ -119,12 +148,13 @@ export class AzureResourceGroupDeployment {
             var credentials = new msRestAzure.ApplicationTokenCredentials(servicePrincipalId, tenantId, servicePrincipalKey);
             return credentials;
         } else {
-            var pemFile:string = __dirname+"/temp.pem";
+            // Azure Classic
+            var pemFile:string = TEMP_DIR + "/temp.pem"; // Temporary .pem file for authentication will be created at this path
             if (endpointAuth.scheme === "Certificate") {
-                var publishSettingsFile:string = __dirname+"/temp.publishsettings";
+                var publishSettingsFile:string = TEMP_DIR + "/temp.publishsettings";
                 this.createPublishSettingsFile(endpointAuth.parameters["certificate"], publishSettingsFile);
-                tl.execSync("azure", "account cert export -f "+pemFile+" -p "+ publishSettingsFile);
-                fs.unlinkSync(publishSettingsFile);
+                tl.execSync("azure", "account cert export -f "+ pemFile +" -p "+ publishSettingsFile); // Exports a certificate to temp .pem file path we specified
+                this.deleteFile(publishSettingsFile); 
             } else if (endpointAuth.scheme === "UsernamePassword") {
                 var username:string = endpointAuth.parameters["username"];
                 var password:string = endpointAuth.parameters["password"];
@@ -139,7 +169,7 @@ export class AzureResourceGroupDeployment {
                     subscriptionId: tl.getEndpointDataParameter(this.connectedService, "SubscriptionId", true),
                     pem: fs.readFileSync(pemFile)
                 };
-                fs.unlink(pemFile);
+                this.deleteFile(pemFile);
                 tl.execSync("azure", "account clear");
                 return asmSchedule.createCertificateCloudCredentials(certificate);
             } else {
