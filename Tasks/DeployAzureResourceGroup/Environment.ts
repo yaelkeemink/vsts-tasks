@@ -114,7 +114,7 @@ export class RegisterEnvironment {
         if (this.publicAddressToNetworkIdMap == null || this.publicAddressToFqdnMap == null || this.networkIdToTagsMap == null) {
             return;
         }
-        var resources = this.getResources();
+        var resources = this.populateResources();
         var environment = new Environment(resources, process.env["SYSTEM_COLLECTIONID"], process.env["SYSTEM_TEAMPROJECT"], this.outputVariable);
         console.log(JSON.stringify(environment));                
         tl.setVariable(this.outputVariable, JSON.stringify(environment));
@@ -125,7 +125,7 @@ export class RegisterEnvironment {
         return this.networkIdToTagsMap[networkId];
     }
 
-    private getResources() {
+    private populateResources() {
         var resources = new Array<Resource>();
         var id = 1;
         for (var addressId in this.publicAddressToFqdnMap) {
