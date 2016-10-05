@@ -83,7 +83,6 @@ export class AzureResourceGroupDeployment {
             tl.setResult(tl.TaskResult.Failed, "Error while validating credentials : " + error);
             return;
         }
-        
         if (this.connectedServiceNameSelector === "ConnectedServiceName") {
             switch (this.action) {
                 case "Create Or Update Resource Group":
@@ -98,7 +97,7 @@ export class AzureResourceGroupDeployment {
                     new virtualMachine.VirtualMachine(this.resourceGroupName, this.action, this.subscriptionId, this.connectedService, this.credentials);
                     break;
                 default:
-                    tl.setResult(tl.TaskResult.Succeeded, tl.loc("InvalidAction"));
+                    tl.setResult(tl.TaskResult.Failed, tl.loc("InvalidAction"));
             }
             if (this.outputVariable && this.outputVariable.trim() != "" && this.action != "Select Resource Group") {
                 try {
@@ -126,45 +125,50 @@ export class AzureResourceGroupDeployment {
 
     private createPublishSettingsFile(certificate:string, publishSettingsFile:string) {
         var contents = util.format(`<?xml version="1.0" encoding="utf-8"?>
-                                    <PublishData><PublishProfile SchemaVersion="2.0" PublishMethod="AzureServiceManagementAPI">
+                                    <PublishData>
+                                    <PublishProfile SchemaVersion="2.0" PublishMethod="AzureServiceManagementAPI">
                                     <Subscription ServiceManagementUrl="https://management.core.windows.net" Id="%s" Name="%s" ManagementCertificate="%s" /> 
-                                    </PublishProfile></PublishData>`, this.subscriptionId, tl.getEndpointDataParameter(this.connectedService, "SubscriptionName", true), certificate);
+                                    </PublishProfile>
+                                    </PublishData>`, this.subscriptionId, tl.getEndpointDataParameter(this.connectedService, "SubscriptionName", true), certificate);
         try {
             this.writeFile(publishSettingsFile, contents);
         }
         catch(err) {
            this.deleteFile(publishSettingsFile);
-           tl.setResult(tl.TaskResult.Failed, "Failed while creating temporary publish Settings file " + err);
+           throw new Error("TemporaryPublishSettingsCreationFailed" + err);
+        }
+    }
+
+    private generateTempPemFile(pemFile:string, endpointAuth):void {
+        // Azure Classic
+        if (endpointAuth.scheme === "Certificate") {
+            var publishSettingsFile:string = TEMP_DIR + "/temp.publishsettings";
+            this.createPublishSettingsFile(endpointAuth.parameters["certificate"], publishSettingsFile);
+            tl.execSync("azure", "account cert export -f "+ pemFile +" -p "+ publishSettingsFile); // Exports a certificate to temp .pem file path we specified
+            this.deleteFile(publishSettingsFile); 
+        } else if (endpointAuth.scheme === "UsernamePassword") {
+            var username:string = endpointAuth.parameters["username"];
+            var password:string = endpointAuth.parameters["password"];
+            tl.execSync("azure", "login -u \"" + username + "\" -p \"" + password + "\"");
+            tl.execSync("azure", "account cert export -f "+ pemFile)
+        } else {
+            throw new Error("UnsupportedAuthorizationScheme");
         }
     }
 
     private getAzureCredentials() {
-        var endpointAuth = tl.getEndpointAuthorization(this.connectedService, true);
-        // Azure Resource Manager
-        if (this.connectedServiceNameSelector === "ConnectedServiceName") {
-            var servicePrincipalId:string = endpointAuth.parameters["serviceprincipalid"];
-            var servicePrincipalKey:string = endpointAuth.parameters["serviceprincipalkey"];
-            var tenantId:string = endpointAuth.parameters["tenantid"];
-            var credentials = new msRestAzure.ApplicationTokenCredentials(servicePrincipalId, tenantId, servicePrincipalKey);
-            return credentials;
-        } else {
-            // Azure Classic
-            var pemFile:string = TEMP_DIR + "/temp.pem"; // Temporary .pem file for authentication will be created at this path
-            if (endpointAuth.scheme === "Certificate") {
-                var publishSettingsFile:string = TEMP_DIR + "/temp.publishsettings";
-                this.createPublishSettingsFile(endpointAuth.parameters["certificate"], publishSettingsFile);
-                tl.execSync("azure", "account cert export -f "+ pemFile +" -p "+ publishSettingsFile); // Exports a certificate to temp .pem file path we specified
-                this.deleteFile(publishSettingsFile); 
-            } else if (endpointAuth.scheme === "UsernamePassword") {
-                var username:string = endpointAuth.parameters["username"];
-                var password:string = endpointAuth.parameters["password"];
-                tl.execSync("azure", "login -u \"" + username + "\" -p \"" + password + "\"");
-                tl.execSync("azure", "account cert export -f "+ pemFile)
+        try {
+            var endpointAuth = tl.getEndpointAuthorization(this.connectedService, true);
+            // Azure Resource Manager
+            if (this.connectedServiceNameSelector === "ConnectedServiceName") {
+                var servicePrincipalId:string = endpointAuth.parameters["serviceprincipalid"];
+                var servicePrincipalKey:string = endpointAuth.parameters["serviceprincipalkey"];
+                var tenantId:string = endpointAuth.parameters["tenantid"];
+                var credentials = new msRestAzure.ApplicationTokenCredentials(servicePrincipalId, tenantId, servicePrincipalKey);
+                return credentials;
             } else {
-                tl.setResult(tl.TaskResult.Failed, "Unsupported Authorization Scheme");
-                return;
-            }
-            if (fs.existsSync(pemFile)) {
+                var pemFile:string = TEMP_DIR + "/temp.pem"; // Temporary .pem file for authentication will be created at this path
+                var success = this.generateTempPemFile(pemFile, endpointAuth);
                 var certificate = {
                     subscriptionId: tl.getEndpointDataParameter(this.connectedService, "SubscriptionId", true),
                     pem: fs.readFileSync(pemFile)
@@ -172,12 +176,10 @@ export class AzureResourceGroupDeployment {
                 this.deleteFile(pemFile);
                 tl.execSync("azure", "account clear");
                 return asmSchedule.createCertificateCloudCredentials(certificate);
-            } else {
-                tl.setResult(tl.TaskResult.Failed, "Failed while validating credentials");
-                return;
             }
+        } catch(error) {
+            tl.setResult(tl.TaskResult.Failed, tl.loc("ValidatingCredentialsFailure", error));
         }
-
     }
 }
 

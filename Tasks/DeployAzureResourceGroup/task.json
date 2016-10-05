@@ -16,7 +16,7 @@
         "Patch": 91
     },
     "demands": [
-        "azureps"
+        "azure-cli"
     ],
     "minimumAgentVersion": "1.103.0",
     "groups": [

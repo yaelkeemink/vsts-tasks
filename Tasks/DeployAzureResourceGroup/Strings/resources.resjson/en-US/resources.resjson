@@ -90,6 +90,7 @@
   "loc.messages.VM_ListFetchFailed": "Task failed while fetching VMs list from '%s' due to the following error: %s",
   "loc.messages.TaskNotFound": "Task.json file could not be found: %s",
   "loc.message.FailedRegisteringEnvironment": "Task failed while registering environment, due to the following error: %s",
-  "loc.message.selectResourceGroupSuccessfull": "Selected Resource Group: '%s' and stored it in '%s'"
+  "loc.message.selectResourceGroupSuccessfull": "Selected Resource Group: '%s' and stored it in '%s'",
+  "loc.message.ValidatingCredentialsFailure": "Failed while validating credentials due to following error: %s"
   
 }
