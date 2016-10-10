@@ -1,6 +1,6 @@
 {
     "id": "FAC24BCD-B2D1-4FD0-8FCA-7F4645EE9A98",
-    "name": "Preview:VSTest",
+    "name": "PreviewVSTest",
     "friendlyName": "Visual Studio Test Preview",
     "description": "Run tests with Visual Studio test runner. Preview Task for TIA functionality.",
     "helpMarkDown": "[More Information](https://go.microsoft.com/fwlink/?LinkId=624539)",
