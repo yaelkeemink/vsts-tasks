@@ -68,10 +68,7 @@
             "label": "Script Arguments",
             "defaultValue": "",
             "required": false,
-            "helpMarkDown": "Additional parameters to pass to PowerShell.  Can be either ordinal or named parameters.",
-            "properties" : {
-                "editorExtension": "ms.vss-service-distributed-task.key-value-grid"
-            }
+            "helpMarkDown": "Additional parameters to pass to PowerShell.  Can be either ordinal or named parameters."
         }
     ],
     "instanceNameFormat": "Azure PowerShell script: $(ScriptPath)",

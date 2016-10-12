@@ -68,10 +68,7 @@
       "label": "ms-resource:loc.input.label.ScriptArguments",
       "defaultValue": "",
       "required": false,
-      "helpMarkDown": "ms-resource:loc.input.help.ScriptArguments",
-      "properties" : {
-        "editorExtension": "ms.vss-service-distributed-task.key-value-grid"
-      }
+      "helpMarkDown": "ms-resource:loc.input.help.ScriptArguments"
     }
   ],
   "instanceNameFormat": "ms-resource:loc.instanceNameFormat",

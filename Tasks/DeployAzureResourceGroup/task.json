@@ -163,9 +163,6 @@
             "defaultValue": "",
             "required": false,
             "helpMarkDown": "Specify the template parameters to override like, <br>–storageName fabrikam –adminUsername $(vmusername) -adminPassword (ConvertTo-SecureString -String '$(password)' -AsPlainText -Force) –azureKeyVaultName $(fabrikamFibre).",
-            "properties": {
-                "editorExtension": "ms.vss-service-distributed-task.key-value-grid"
-            },
             "visibleRule": "action = Create Or Update Resource Group"
         },
         {
