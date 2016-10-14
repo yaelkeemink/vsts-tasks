@@ -35,5 +35,5 @@
   "loc.input.label.jdkUserInputPath": "Percorso JDK",
   "loc.input.help.jdkUserInputPath": "Consente di impostare JAVA_HOME sul percorso specificato.",
   "loc.input.label.jdkArchitecture": "Architettura JDK",
-  "loc.input.help.jdkArchitecture": "Consente, facoltativamente, di specificare l'architettura (x86, x64) di JDK."
+  "loc.input.help.jdkArchitecture": "Consente facoltativamente di specificare l'architettura (x86, x64) di JDK."
 }

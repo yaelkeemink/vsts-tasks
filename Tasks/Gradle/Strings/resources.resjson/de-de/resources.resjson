@@ -84,7 +84,7 @@
   "loc.messages.codeAnalysisBuildSummaryLine_NoViolations": "%s hat keine Verstöße gefunden.",
   "loc.messages.codeAnalysisBuildSummaryTitle": "Codeanalysebericht",
   "loc.messages.codeAnalysisArtifactSummaryTitle": "Codeanalyseergebnisse",
-  "loc.messages.codeAnalysisDisabled": "Code analysis is disabled outside of the build enviroment. Could not find a value for: %s",
-  "loc.messages.LocateJVMBasedOnVersionAndArch": "Locate JAVA_HOME for Java %s %s",
-  "loc.messages.FailedToLocateSpecifiedJVM": "Failed to find specified JDK version. Please make sure environment variable '%s' exists and is set to the location of a corresponding JDK."
+  "loc.messages.codeAnalysisDisabled": "Die Codeanalyse ist außerhalb der Buildumgebung deaktiviert. Es konnte kein Wert gefunden werden für: %s",
+  "loc.messages.LocateJVMBasedOnVersionAndArch": "JAVA_HOME für Java %s %s finden",
+  "loc.messages.FailedToLocateSpecifiedJVM": "Die angegebene JDK-Version wurde nicht gefunden. Stellen Sie sicher, dass die Umgebungsvariable \"%s\" vorhanden ist und auf den Speicherort eines entsprechenden JDK festgelegt wurde."
 }

@@ -1,5 +1,5 @@
 {
-  "loc.friendlyName": "Azure SQL 데이터베이스 배포",
+  "loc.friendlyName": "Azure SQL Database 배포",
   "loc.helpMarkDown": "[자세한 정보](https://aka.ms/sqlazuredeployreadme)",
   "loc.description": "DACPAC를 사용하여 Azure SQL DB를 배포하거나 SQLCMD를 사용하여 스크립트를 실행합니다.",
   "loc.instanceNameFormat": "Azure SQL 실행: $(TaskNameSelector)",
@@ -43,7 +43,7 @@
   "loc.input.label.DeleteFirewallRule": "작업 종료 후 규칙 삭제",
   "loc.input.help.DeleteFirewallRule": "선택하면 작업이 종료된 후 여기에서 지정된 IP 주소가 Azure SQL Server 방화벽의 '허용되는 IP 주소' 목록에서 삭제됩니다.",
   "loc.messages.SAD_InvalidServerAddress": "언급된 IPAddress는 유효한 IPv4 주소 또는 SQL 데이터베이스 서버가 아닙니다. '{0}'이(가) 없습니다.",
-  "loc.messages.SAD_ServerNotFound": "SQL 데이터베이스 서버 '{0}'을(를) 찾을 수 없습니다.",
+  "loc.messages.SAD_ServerNotFound": "SQL Database 서버 '{0}'을(를) 찾을 수 없습니다.",
   "loc.messages.SAD_InvalidIPv4Address": "언급된 IPAddress는 유효한 IPv4 주소가 아닙니다.",
   "loc.messages.SAD_FoundMoreFiles": "검색 패턴 {0}(으)로 배포할 파일을 두 개 이상 찾았습니다. 하나만 있을 수 있습니다.",
   "loc.messages.SAD_NoFilesMatch": "검색 패턴 {0}(으)로 배포할 파일을 찾을 수 없습니다.",

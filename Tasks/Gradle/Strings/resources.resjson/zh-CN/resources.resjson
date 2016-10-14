@@ -84,7 +84,7 @@
   "loc.messages.codeAnalysisBuildSummaryLine_NoViolations": "%s 未发现任何冲突。",
   "loc.messages.codeAnalysisBuildSummaryTitle": "代码分析报告",
   "loc.messages.codeAnalysisArtifactSummaryTitle": "代码分析结果",
-  "loc.messages.codeAnalysisDisabled": "Code analysis is disabled outside of the build enviroment. Could not find a value for: %s",
-  "loc.messages.LocateJVMBasedOnVersionAndArch": "Locate JAVA_HOME for Java %s %s",
-  "loc.messages.FailedToLocateSpecifiedJVM": "Failed to find specified JDK version. Please make sure environment variable '%s' exists and is set to the location of a corresponding JDK."
+  "loc.messages.codeAnalysisDisabled": "在生成环境外部禁用代码分析。无法找到 %s 的值",
+  "loc.messages.LocateJVMBasedOnVersionAndArch": "为 Java %s %s 查找 JAVA_HOME",
+  "loc.messages.FailedToLocateSpecifiedJVM": "未能找到指定 JDK 版本。请确保环境变量“%s”存在并被设置为相应 JDK 的位置。"
 }

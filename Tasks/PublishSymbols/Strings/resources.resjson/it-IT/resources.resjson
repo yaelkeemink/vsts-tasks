@@ -15,7 +15,7 @@
   "loc.input.label.TreatNotIndexedAsWarning": "Avvisa se non indicizzate",
   "loc.input.help.TreatNotIndexedAsWarning": "Indica se verranno visualizzati avvisi nel caso in cui le origini non sono indicizzate per un file PDB. In caso contrario, i messaggi verranno registrati come output normale.",
   "loc.input.label.SymbolsMaximumWaitTime": "Tempo massimo di attesa (min)",
-  "loc.input.help.SymbolsMaximumWaitTime": "Numero di minuti da attendere prima che l'istruzione venga considerata in errore",
+  "loc.input.help.SymbolsMaximumWaitTime": "Numero di minuti da attendere prima che il passaggio venga considerato non riuscito",
   "loc.input.label.SymbolsProduct": "Prodotto",
   "loc.input.help.SymbolsProduct": "Consente di specificare il parametro del prodotto per symstore.exe. L'impostazione predefinita è $(Build.DefinitionName)",
   "loc.input.label.SymbolsVersion": "Versione",

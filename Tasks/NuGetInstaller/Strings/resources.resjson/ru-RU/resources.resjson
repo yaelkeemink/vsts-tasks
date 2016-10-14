@@ -16,13 +16,13 @@
   "loc.input.help.nuGetRestoreArgs": "Дополнительные аргументы, передаваемые средству восстановления или установки NuGet.exe. [Подробнее](https://docs.nuget.org/consume/command-line-reference#user-content-restore-command).",
   "loc.input.label.verbosity": "Уровень детализации",
   "loc.input.help.verbosity": "Уровень детализации NuGet",
-  "loc.input.label.nuGetVersion": "NuGet Version",
-  "loc.input.help.nuGetVersion": "The version of NuGet to use, or external verson.",
+  "loc.input.label.nuGetVersion": "Версия NuGet",
+  "loc.input.help.nuGetVersion": "Версия NuGet для использования или внешняя версия.",
   "loc.input.label.nuGetPath": "Путь к NuGet.exe",
-  "loc.input.help.nuGetPath": "Optionally supply the path to NuGet.exe. Will override version selection.",
+  "loc.input.help.nuGetPath": "При необходимости укажите путь к NuGet.exe. При этом выбранная версия будет переопределена.",
   "loc.messages.Warning_NoConfigForOldNuGet": "Чтобы подключиться к каналам NuGet, размещенным в вашей учетной записи Team Services или коллекции проектов TFS, используя NuGet 3.1 или предшествующую версию, измените определение сборки и укажите путь к файлу NuGet.config, в котором содержатся нужные вам источники пакетов.",
   "loc.messages.Warning_NoConfigForNoCredentialProvider": "Чтобы подключиться к каналам NuGet, размещенным в вашей учетной записи Team Services или коллекции проектов TFS на этом агенте сборки, измените определение сборки и укажите путь к файлу NuGet.config, в котором содержатся нужные вам источники пакетов.",
-  "loc.messages.Warning_ConflictingNuGetPreference": "NuGet 3.3 was selected, but a custom NuGet path was provided. The custom path will be preferred. To resolve this warning, edit your build task and select 'custom' for NuGet version under Advanced.",
+  "loc.messages.Warning_ConflictingNuGetPreference": "Был выбран NuGet 3.3, но при этом был указан настраиваемый путь NuGet. Будет использован настраиваемый путь. Чтобы устранить это предупреждение, измените задачу сборки и укажите настраиваемое значение для версии NuGet в разделе \"Дополнительно\".",
   "loc.messages.PackagesInstalledSuccessfully": "Пакеты успешно установлены",
   "loc.messages.PackagesFailedToInstall": "Не удалось установить пакеты",
   "loc.messages.ConnectingAs": "Подключение к каналам в учетной записи Team Services или коллекции проектов TFS в качестве \"%s\" [%s]",
@@ -31,7 +31,7 @@
   "loc.messages.NotARegularFile": "%s не является файлом решения. Проверьте свойство \"Путь к решению или файлу packages.config\" задачи NuGetInstaller.",
   "loc.messages.UnknownRestoreMode": "Неизвестный режим восстановления (\"%s\")",
   "loc.messages.CouldNotFindNuGetService": "Не удалось найти службу NuGet. Эта задача не сможет проходить проверку подлинности в каналах, размещенных в вашей учетной записи Team Services или коллекции проектов TFS.",
-  "loc.messages.NoNuGetSpecified": "If 'custom' is selected, you must provide a path to NuGet.exe",
+  "loc.messages.NoNuGetSpecified": "Если выбрано настраиваемое значение, необходимо указать путь к файлу NuGet.exe.",
   "loc.messages.NGCommon_DetectedNuGetVersion": "Обнаруженная версия NuGet %s/%s",
   "loc.messages.NGCommon_IgnoringNuGetExtensionsPath": "Обнаружен путь к загрузчику расширений NuGet (переменная среды NUGET_EXTENSIONS_PATH). Расширения пропускаются при использовании встроенного клиента NuGet.",
   "loc.messages.NGCommon_DetectedNuGetExtensionsPath": "Обнаружен путь к загрузчику расширений NuGet (переменная среды NUGET_EXTENSIONS_PATH): %s",
@@ -43,5 +43,5 @@
   "loc.messages.NGCommon_RemovingSources": "Подготовка к настройке учетных данных в NuGet.config",
   "loc.messages.NGCommon_AddingSources": "Идет настройка учетных данных в NuGet.config",
   "loc.messages.NGCommon_NoSourcesFoundInConfig": "Не найдены источники пакетов в файле NuGet.config в \"%s\"",
-  "loc.messages.NGCommon_UnabletoDetectNuGetVersion": "Unknown NuGet version selected."
+  "loc.messages.NGCommon_UnabletoDetectNuGetVersion": "Выбрана неизвестная версия NuGet."
 }

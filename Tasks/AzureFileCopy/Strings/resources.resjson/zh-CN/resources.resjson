@@ -46,7 +46,7 @@
   "loc.input.label.skipCACheck": "测试证书",
   "loc.input.help.skipCACheck": "如果选择了此选项，则在通过安全套接字层超文本传输协议(HTTPS)连接时，客户端将跳过验证服务器证书是否由受信任的证书颁发机构(CA)签署这一步骤。",
   "loc.input.label.outputStorageUri": "存储容器 URI",
-  "loc.input.help.outputStorageUri": "向通过此任务将文件复制到的存储容器 URI 的变量提供一个名称。只有在所选目标为 Azure Blob 时才有效。",
+  "loc.input.help.outputStorageUri": "为在此任务中作为文件复制目标位置的存储容器 URI 提供变量名称。只有在所选目标为 Azure Blob 时才有效。",
   "loc.input.label.outputStorageContainerSasToken": "存储容器 SAS 令牌",
   "loc.input.help.outputStorageContainerSasToken": "向存储容器 SAS 令牌的变量提供一个名称，该令牌用于访问通过此任务复制到的文件。只有在所选目标为 Azure Blob 时才有效。",
   "loc.messages.AFC_StorageAccountNotFound": "未找到存储帐户 {0}。选定的连接 \"ServicePrincipal\" 仅支持 Azure Resource Manager 类型的存储帐户。",

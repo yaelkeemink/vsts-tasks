@@ -15,13 +15,13 @@
   "loc.input.help.nuGetAdditionalArgs": "傳遞至 NuGet.exe 推送的其他引數。[詳細資訊](https://docs.nuget.org/consume/command-line-reference#user-content-push-command)。",
   "loc.input.label.verbosity": "詳細資訊",
   "loc.input.help.verbosity": "NuGet 的詳細資訊層級",
-  "loc.input.label.nuGetVersion": "NuGet Version",
-  "loc.input.help.nuGetVersion": "The version of NuGet to use, or custom verson.",
+  "loc.input.label.nuGetVersion": "NuGet 版本",
+  "loc.input.help.nuGetVersion": "要使用的 NuGet 版本，或自訂版本。",
   "loc.input.label.nuGetPath": "NuGet.exe 的路徑",
-  "loc.input.help.nuGetPath": "Optionally supply the path to NuGet.exe. Will override version selection.",
+  "loc.input.help.nuGetPath": "選擇性地提供 NuGet.exe 的路徑。將覆寫版本選取項目。",
   "loc.messages.Warning_NoConfigForOldNuGet": "若要連線到使用 NuGet 3.1 或更低版本裝載於 Team Services 帳戶/TFS 專案集合中的 NuGet 摘要，請編輯您的組建定義以指定路徑，連到包含您要使用之套件來源的 NuGet.config。",
   "loc.messages.Warning_NoConfigForNoCredentialProvider": "若要連線到裝載於此組建代理程式上 Team Services 帳戶/TFS 專案集合中的 NuGet 摘要，請編輯您的組建定義以指定路徑，連到包含您要使用之套件來源的 NuGet.config。",
-  "loc.messages.Warning_ConflictingNuGetPreference": "NuGet 3.3 was selected, but a custom NuGet path was provided. The custom path will be preferred. To resolve this warning, edit your build task and select 'custom' for NuGet version under Advanced.",
+  "loc.messages.Warning_ConflictingNuGetPreference": "選取了 NuGet 3.3，但提供的是自訂 NuGet 路徑。慣用自訂路徑。若要解決此警告，請編輯您的組建工作，然後選取 [進階] 下 NuGet 版本的 [自訂]。",
   "loc.messages.PackagesPublishedSuccessfully": "已成功發行套件",
   "loc.messages.PackagesFailedToPublish": "無法發行套件",
   "loc.messages.ConnectingAs": "正作為 '%s' [%s] 連接至您 Team Services 帳戶/TFS 專案集合中的摘要",
@@ -30,7 +30,7 @@
   "loc.messages.NotARegularFile": "%s 不是一般檔案。請檢查 NuGetPublisher 工作的「nupkg 的路徑/模式」屬性。",
   "loc.messages.UnknownFeedType": "未知的摘要類型 '%s'",
   "loc.messages.CouldNotFindNuGetService": "找不到 NuGet 服務。此工作將無法向您 Team Services 帳戶/TFS 專案集合中裝載的摘要驗證。",
-  "loc.messages.NoNuGetSpecified": "If 'custom' is selected, you must provide a path to NuGet.exe",
+  "loc.messages.NoNuGetSpecified": "若選取 [自訂]，則必須提供 NuGet.exe 的路徑",
   "loc.messages.NGCommon_DetectedNuGetVersion": "偵測到 NuGet 版本 %s / %s",
   "loc.messages.NGCommon_IgnoringNuGetExtensionsPath": "偵測到 NuGet 擴充功能載入器路徑 (NUGET_EXTENSIONS_PATH 環境變數)。使用內建 NuGet 用戶端時會忽略擴充功能",
   "loc.messages.NGCommon_DetectedNuGetExtensionsPath": "偵測到 NuGet 擴充功能載入器路徑 (NUGET_EXTENSIONS_PATH 環境變數): %s",
@@ -42,5 +42,5 @@
   "loc.messages.NGCommon_RemovingSources": "正在準備設定 NuGet.config 中的認證",
   "loc.messages.NGCommon_AddingSources": "正在設定 NuGet.config 中的認證",
   "loc.messages.NGCommon_NoSourcesFoundInConfig": "在位於 %s 的 NuGet.config 檔案中找不到套件來源",
-  "loc.messages.NGCommon_UnabletoDetectNuGetVersion": "Unknown NuGet version selected."
+  "loc.messages.NGCommon_UnabletoDetectNuGetVersion": "選取了不明的 NuGet 版本。"
 }

@@ -16,13 +16,13 @@
   "loc.input.help.nuGetRestoreArgs": "Zusätzliche Argumente, die für die Wiederherstellung oder Installation an \"NuGet.exe\" übergeben werden. [Weitere Informationen](https://docs.nuget.org/consume/command-line-reference#user-content-restore-command).",
   "loc.input.label.verbosity": "Ausführlichkeit",
   "loc.input.help.verbosity": "Ausführlichkeitsgrad von NuGet",
-  "loc.input.label.nuGetVersion": "NuGet Version",
-  "loc.input.help.nuGetVersion": "The version of NuGet to use, or external verson.",
+  "loc.input.label.nuGetVersion": "NuGet-Version",
+  "loc.input.help.nuGetVersion": "Die zu verwendende Version von NuGet oder eine externe Version.",
   "loc.input.label.nuGetPath": "Pfad zu NuGet.exe",
-  "loc.input.help.nuGetPath": "Optionally supply the path to NuGet.exe. Will override version selection.",
+  "loc.input.help.nuGetPath": "Geben Sie optional den Pfad zu NuGet.exe an. Die Versionsauswahl wird außer Kraft gesetzt.",
   "loc.messages.Warning_NoConfigForOldNuGet": "Bearbeiten Sie zum Herstellen einer Verbindung mit NuGet-Feeds, die in Ihrem Team Services-Konto bzw. Ihrer TFS-Projektsammlung mit NuGet 3.1 oder niedriger gehostet werden, die Builddefinition so, dass ein Pfad zu einer Datei \"NuGet.config\" angegeben wird, die die Paketquellen enthält, die Sie verwenden möchten.",
   "loc.messages.Warning_NoConfigForNoCredentialProvider": "Bearbeiten Sie zum Herstellen einer Verbindung mit NuGet-Feeds, die in Ihrem Team Services-Konto bzw. Ihrer TFS-Projektsammlung auf diesem Build-Agent gehostet werden, die Builddefinition so, dass ein Pfad zu einer Datei \"NuGet.config\" angegeben wird, die die Paketquellen enthält, die Sie verwenden möchten.",
-  "loc.messages.Warning_ConflictingNuGetPreference": "NuGet 3.3 was selected, but a custom NuGet path was provided. The custom path will be preferred. To resolve this warning, edit your build task and select 'custom' for NuGet version under Advanced.",
+  "loc.messages.Warning_ConflictingNuGetPreference": "NuGet 3.3 wurde ausgewählt, aber es wurde ein benutzerdefinierter NuGet-Pfad angegeben. Der benutzerdefinierte Pfad wird bevorzugt. Um diese Warnung aufzulösen, bearbeiten Sie Ihren Buildtask, und wählen Sie unter \"Erweitert\" die Option \"Benutzerdefiniert\" für die NuGet-Version.",
   "loc.messages.PackagesInstalledSuccessfully": "Pakete wurden erfolgreich installiert.",
   "loc.messages.PackagesFailedToInstall": "Fehler beim Installieren der Pakete.",
   "loc.messages.ConnectingAs": "Die Verbindung mit Feeds in Ihrem Team Services-Konto bzw. Ihrer TFS-Projektsammlung wird als \"%s\" [%s] hergestellt.",
@@ -31,7 +31,7 @@
   "loc.messages.NotARegularFile": "%s ist keine Projektmappendatei. Überprüfen Sie die Eigenschaft \"Pfad zur Projektmappe oder zu packages.config\" des NuGetInstaller-Tasks.",
   "loc.messages.UnknownRestoreMode": "Unbekannter Wiederherstellungsmodus \"%s\".",
   "loc.messages.CouldNotFindNuGetService": "Der NuGet-Dienst wurde nicht gefunden. Dieser Task kann sich nicht bei Feeds authentifizieren, die in Ihrem Team Services-Konto bzw. in der TFS-Projektsammlung gehostet werden.",
-  "loc.messages.NoNuGetSpecified": "If 'custom' is selected, you must provide a path to NuGet.exe",
+  "loc.messages.NoNuGetSpecified": "Wenn \"Benutzerdefiniert\" ausgewählt wird, müssen Sie einen Pfad zu \"NuGet.exe\" angeben.",
   "loc.messages.NGCommon_DetectedNuGetVersion": "Erkannte NuGet-Version %s/%s",
   "loc.messages.NGCommon_IgnoringNuGetExtensionsPath": "Ein Ladeprogrammpfad für NuGet-Extensions (Umgebungsvariable \"NUGET_EXTENSIONS_PATH\") wurde erkannt. Extensions werden ignoriert, wenn der integrierte NuGet-Client verwendet wird.",
   "loc.messages.NGCommon_DetectedNuGetExtensionsPath": "Ein Ladeprogrammpfad für NuGet-Extensions (Umgebungsvariable \"NUGET_EXTENSIONS_PATH\") wurde erkannt: %s",
@@ -43,5 +43,5 @@
   "loc.messages.NGCommon_RemovingSources": "Das Festlegen von Anmeldeinformationen in \"NuGet.config\" wird vorbereitet.",
   "loc.messages.NGCommon_AddingSources": "Anmeldeinformationen in der Datei \"NuGet.config\" werden festgelegt.",
   "loc.messages.NGCommon_NoSourcesFoundInConfig": "In der Datei \"NuGet.config\" unter \"%s\" wurden keine Paketquellen gefunden.",
-  "loc.messages.NGCommon_UnabletoDetectNuGetVersion": "Unknown NuGet version selected."
+  "loc.messages.NGCommon_UnabletoDetectNuGetVersion": "Unbekannte NuGet-Version ausgewählt."
 }

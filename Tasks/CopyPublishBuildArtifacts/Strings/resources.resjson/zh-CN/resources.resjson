@@ -13,5 +13,5 @@
   "loc.input.help.ArtifactType": "要创建的项目的类型。",
   "loc.input.label.TargetPath": "路径",
   "loc.input.help.TargetPath": "要将文件复制到的文件共享",
-  "loc.messages.ErrorFileShareLinux": "Cannot publish artifacts from an OSX or Linux agent to a file share. You can change the artifact type to server or use a Windows agent."
+  "loc.messages.ErrorFileShareLinux": "无法将来自 OSX 或 Linux 代理的项目发布到文件共享。可将项目类型更改为服务器或使用 Windows 代理。"
 }

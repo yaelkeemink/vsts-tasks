@@ -15,13 +15,13 @@
   "loc.input.help.nuGetAdditionalArgs": "NuGet.exe プッシュに渡される追加引数。[詳細] (https://docs.nuget.org/consume/command-line-reference#user-content-push-command)。",
   "loc.input.label.verbosity": "詳細",
   "loc.input.help.verbosity": "NuGet の詳細レベル",
-  "loc.input.label.nuGetVersion": "NuGet Version",
-  "loc.input.help.nuGetVersion": "The version of NuGet to use, or custom verson.",
+  "loc.input.label.nuGetVersion": "NuGet バージョン",
+  "loc.input.help.nuGetVersion": "使用する NuGet のバージョン、またはカスタム バージョン。",
   "loc.input.label.nuGetPath": "NuGet.exe へのパス",
-  "loc.input.help.nuGetPath": "Optionally supply the path to NuGet.exe. Will override version selection.",
+  "loc.input.help.nuGetPath": "(省略可能) NuGet.exe へのパスを指定します。バージョンの選択が上書きされます。",
   "loc.messages.Warning_NoConfigForOldNuGet": "NuGet 3.1 以前で Team Services アカウント/TFS プロジェクト コレクションでホストされている NuGet フィードに接続するには、ビルド定義を編集して、使用するパッケージ ソースを含む NuGet.config へのパスを指定します。",
   "loc.messages.Warning_NoConfigForNoCredentialProvider": "このビルド エージェントの Team Services アカウント/TFS プロジェクト コレクションでホストされている NuGet フィードに接続するには、ビルド定義を編集して、使用するパッケージ ソースを含む NuGet.config へのパスを指定します。",
-  "loc.messages.Warning_ConflictingNuGetPreference": "NuGet 3.3 was selected, but a custom NuGet path was provided. The custom path will be preferred. To resolve this warning, edit your build task and select 'custom' for NuGet version under Advanced.",
+  "loc.messages.Warning_ConflictingNuGetPreference": "NuGet 3.3 を選ばれましたがカスタム NuGet パスが指定されました。カスタム パスが優先されます。この警告を解決するには、ビルド タスクを編集して、[詳細設定] で NuGet バージョンに [カスタム] を選びます。",
   "loc.messages.PackagesPublishedSuccessfully": "パッケージが正常に発行されました",
   "loc.messages.PackagesFailedToPublish": "パッケージを発行できませんでした",
   "loc.messages.ConnectingAs": "'%s' [%s] として Team Services アカウント/TFS プロジェクト コレクションのフィードに接続しています",
@@ -30,7 +30,7 @@
   "loc.messages.NotARegularFile": "%s は通常のファイルではありません。NuGetPublisher タスクの 'Nupkg へのパス/パターン' プロパティをチェックしてください。",
   "loc.messages.UnknownFeedType": "フィードの種類 '%s' が不明です",
   "loc.messages.CouldNotFindNuGetService": "NuGet サービスが見つかりません。このタスクは、使用している Team Services アカウント/TFS プロジェクト コレクションでホストされているフィードへ認証できません。",
-  "loc.messages.NoNuGetSpecified": "If 'custom' is selected, you must provide a path to NuGet.exe",
+  "loc.messages.NoNuGetSpecified": "[カスタム] を選んでいる場合は、NuGet.exe へのパスを指定する必要があります",
   "loc.messages.NGCommon_DetectedNuGetVersion": "検出された NuGet バージョン %s / %s",
   "loc.messages.NGCommon_IgnoringNuGetExtensionsPath": "NuGet 拡張機能のローダー パス (NUGET_EXTENSIONS_PATH 環境変数) が検出されました。ビルトインの NuGet クライアントを使用するとき、拡張機能は無視されます",
   "loc.messages.NGCommon_DetectedNuGetExtensionsPath": "NuGet 拡張機能のローダー パス (NUGET_EXTENSIONS_PATH 環境変数) が検出されました: %s",
@@ -42,5 +42,5 @@
   "loc.messages.NGCommon_RemovingSources": "NuGet.config での資格情報の設定準備",
   "loc.messages.NGCommon_AddingSources": "NuGet.config での資格証明の設定",
   "loc.messages.NGCommon_NoSourcesFoundInConfig": "%s の NuGet.config ファイルでパッケージ ソースが見つかりません",
-  "loc.messages.NGCommon_UnabletoDetectNuGetVersion": "Unknown NuGet version selected."
+  "loc.messages.NGCommon_UnabletoDetectNuGetVersion": "不明な NuGet バージョンが選ばれました。"
 }

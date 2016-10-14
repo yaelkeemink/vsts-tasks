@@ -7,7 +7,7 @@
   "loc.input.help.ConnectedServiceName": "Sottoscrizione di Azure classico usata come destinazione della distribuzione.",
   "loc.input.label.WebSiteLocation": "Percorso app Web",
   "loc.input.help.WebSiteLocation": "Selezionare una località per il sito Web.",
-  "loc.input.label.WebSiteName": "Nome app Web",
+  "loc.input.label.WebSiteName": "Nome dell'app Web",
   "loc.input.help.WebSiteName": "Immettere il nome del sito Web o selezionarlo dall'elenco.<br>Nota: sono elencati solo i siti Web associati al piano del servizio app predefinito per l'area geografica selezionata.",
   "loc.input.label.Slot": "Slot",
   "loc.input.help.Slot": "Slot",

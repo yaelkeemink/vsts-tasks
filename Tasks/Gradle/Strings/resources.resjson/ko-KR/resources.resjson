@@ -84,7 +84,7 @@
   "loc.messages.codeAnalysisBuildSummaryLine_NoViolations": "%s이(가) 위반을 찾을 수 없습니다.",
   "loc.messages.codeAnalysisBuildSummaryTitle": "코드 분석 보고서",
   "loc.messages.codeAnalysisArtifactSummaryTitle": "코드 분석 결과",
-  "loc.messages.codeAnalysisDisabled": "Code analysis is disabled outside of the build enviroment. Could not find a value for: %s",
-  "loc.messages.LocateJVMBasedOnVersionAndArch": "Locate JAVA_HOME for Java %s %s",
-  "loc.messages.FailedToLocateSpecifiedJVM": "Failed to find specified JDK version. Please make sure environment variable '%s' exists and is set to the location of a corresponding JDK."
+  "loc.messages.codeAnalysisDisabled": "빌드 환경 외부에서 코드 분석을 사용하지 않도록 설정되어 있습니다. %s에 대한 값을 찾을 수 없습니다.",
+  "loc.messages.LocateJVMBasedOnVersionAndArch": "Java %s %s에 대해 JAVA_HOME 찾기",
+  "loc.messages.FailedToLocateSpecifiedJVM": "지정한 JDK 버전을 찾지 못했습니다. '%s' 환경 변수가 있으며 해당 JDK의 위치로 설정되었는지 확인하세요."
 }
