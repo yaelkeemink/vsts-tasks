@@ -261,6 +261,9 @@ function fileExists(path): boolean {
  */
 function getSetParamFilePath(setParametersFile: string) : string {
 
+    console.log('SetParametersFile : ' + setParametersFile);
+    console.log(tl.filePathSupplied('SetParametersFile'));
+    console.log(tl.getVariable('System.DefaultWorkingDirectory'));
     if((!tl.filePathSupplied('SetParametersFile')) || setParametersFile == tl.getVariable('System.DefaultWorkingDirectory')) {
         setParametersFile = null;
     }
