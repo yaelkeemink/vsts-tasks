@@ -264,7 +264,7 @@ function getSetParamFilePath(setParametersFile: string) : string {
     console.log('SetParametersFile : ' + setParametersFile);
     console.log(tl.filePathSupplied('SetParametersFile'));
     console.log(tl.getVariable('System.DefaultWorkingDirectory'));
-    if((!tl.filePathSupplied('SetParametersFile')) || setParametersFile == tl.getVariable('System.DefaultWorkingDirectory')) {
+    if(setParametersFile === null || (!tl.filePathSupplied('SetParametersFile')) || setParametersFile == tl.getVariable('System.DefaultWorkingDirectory')) {
         setParametersFile = null;
     }
     else if (!fileExists(setParametersFile)) {
