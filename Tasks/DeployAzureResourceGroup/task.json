@@ -24,6 +24,16 @@
             "name": "output",
             "displayName": "Output",
             "isExpanded": true
+        },
+        {
+            "name": "template",
+            "displayName": "Template",
+            "isExpanded": true
+        },
+        {
+            "name": "advanced",
+            "displayName": "Advanced Deployment Options",
+            "isExpanded": false
         }
     ],
     "inputs": [
@@ -144,6 +154,7 @@
             "label": "Template",
             "defaultValue": "",
             "required": true,
+            "groupName": "template",
             "helpMarkDown": "Specify the path to the Azure Resource Manager template. For more information about the templates see https://aka.ms/azuretemplates. To get started immediately use template https://aka.ms/sampletemplate.",
             "visibleRule": "action = Create Or Update Resource Group"
         },
@@ -153,6 +164,7 @@
             "label": "Template Parameters",
             "defaultValue": "",
             "required": false,
+            "groupName": "template",
             "helpMarkDown": "Specify the path for the parameters file for the Azure Resource Manager Template.",
             "visibleRule": "action = Create Or Update Resource Group"
         },
@@ -162,6 +174,7 @@
             "label": "Override Template Parameters",
             "defaultValue": "",
             "required": false,
+            "groupName": "template",
             "helpMarkDown": "Specify the template parameters to override like, <br>–storageName fabrikam –adminUsername $(vmusername) -adminPassword (ConvertTo-SecureString -String '$(password)' -AsPlainText -Force) –azureKeyVaultName $(fabrikamFibre).",
             "properties": {
                 "editorExtension": "ms.vss-distributed-task-input-editor.parameters-grid"
@@ -174,6 +187,7 @@
             "label": "Deployment Mode",
             "defaultValue": "Incremental",
             "required": true,
+            "groupName": "advanced",
             "helpMarkDown": "Incremental mode handles deployments as incremental updates to the resource group . It leaves unchanged resources that exist in the resource group but are not specified in the template. \n\n Complete mode deletes resources that are not in your template. \n\n Validate mode enables you to find problems with the template before creating actual resources. \n\n By default, Incremental mode is used.",
             "options": {
                 "Validation": "Validation Only",
@@ -189,6 +203,7 @@
             "defaultValue": "false",
             "visibleRule": "action = Create Or Update Resource Group",
             "required": false,
+            "groupName": "advanced",
             "helpMarkDown": "Enabling this option configures Windows Remote Management (WinRM) listener over HTTPS protocol on port 5986, using a self-signed certificate. This configuration is required for performing deployment operation on Azure machines. If the target Virtual Machines are backed by a Load balancer, ensure Inbound NAT rules are configured for target port (5986)."
         },
         {
@@ -198,6 +213,7 @@
             "defaultValue": "false",
             "visibleRule": "action = Select Resource Group",
             "required": false,
+            "groupName": "advanced",
             "helpMarkDown": "Enabling this option configures Windows Remote Management (WinRM) listener over HTTPS protocol on port 5986, using a self-signed certificate. This configuration is required for performing deployment operation on Azure machines. If the target Virtual Machines are backed by a Load balancer, ensure Inbound NAT rules are configured for target port (5986)."
         },
         {
