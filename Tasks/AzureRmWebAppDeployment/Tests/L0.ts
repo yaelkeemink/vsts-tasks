@@ -6,10 +6,9 @@ describe('AzureRmWebAppDeployment Suite', function() {
      var taskSrcPath = path.join(__dirname, '..');
      var testSrcPath = path.join(__dirname);
 
-     before((done) => {
-        done();
+    before(() => {
     });
-    after(function() {
+    after(() => {
 
     });
 
