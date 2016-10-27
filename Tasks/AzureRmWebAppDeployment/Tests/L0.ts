@@ -11,7 +11,7 @@ describe('AzureRmWebAppDeployment Suite', function() {
     after(() => {
 
     });
-
+/*
     it('Runs successfully with default inputs', (done:MochaDone) => {
         let tp = path.join(__dirname, 'L0WindowsDefault.js');
         let tr : ttm.MockTestRunner = new ttm.MockTestRunner(tp);
@@ -322,5 +322,5 @@ describe('AzureRmWebAppDeployment Suite', function() {
         assert(tr.failed, 'task should have failed');
         done();
     });
-
+*/
 });
