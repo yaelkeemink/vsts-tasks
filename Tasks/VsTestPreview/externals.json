@@ -1,0 +1,9 @@
+{
+    "archivePackages": [
+        {
+            "archiveName": "TestSelector.zip",
+            "url": "https://testselector.blob.core.windows.net/testselector/3360618/TestSelector.zip",
+            "dest": "./"
+        }
+    ]
+}
