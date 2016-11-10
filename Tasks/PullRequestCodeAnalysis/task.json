@@ -33,7 +33,7 @@
         }
     },
     "messages": {
-        "Error_NoReportPathFound": "Make sure a SonarQube-enabled build task ran before this step.",
+        "Error_NoReportPathFound": "Make sure a Maven or Gradle ran before this step and SonarQube was enabled.",
         "Error_InvalidMessageLimit": "Expected message limit to be a positive integer, but instead it was %s",
         "Error_InvalidPullRequestId": "Could not retrieve pull request ID from the server.",
         "Error_FailedToGetAuthToken": "Could not get an authentication token from the build agent.",

@@ -27,7 +27,7 @@ export class SonarQubeReportProcessor implements ISonarQubeReportProcessor {
     public FetchCommentsFromReport(reportPath: string): Message[] {
 
         if (!reportPath) {
-            throw new ReferenceError('Report path is null or empty');
+            throw new ReferenceError('reportPath');
         }
 
         try {

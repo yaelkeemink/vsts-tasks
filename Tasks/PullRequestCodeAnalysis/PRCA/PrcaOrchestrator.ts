@@ -58,20 +58,27 @@ export class PrcaOrchestrator {
      * @param pullRequestId Internal ID of the pull request
      * @returns {PrcaOrchestrator}
      */
-    public static CreatePrcaOrchestrator(logger: ILogger, collectionUrl: string, token: string, repositoryId: string, pullRequestId: number): PrcaOrchestrator {
+    public static Create(
+        logger: ILogger, 
+        collectionUrl: string, 
+        bearerToken: string, 
+        repositoryId: string, 
+        pullRequestId: number,
+        messageLimit: number): PrcaOrchestrator {
+
         if (collectionUrl == null) {
             throw new ReferenceError('collectionUrl');
         }
-        if (token == null) {
+        if (bearerToken == null) {
             throw new ReferenceError('token');
         }
 
-        let creds = web.getBearerHandler(token);
+        let creds = web.getBearerHandler(bearerToken);
         var connection = new WebApi(collectionUrl, creds);
 
         let prcaService: IPrcaService = new PrcaService(logger, connection.getGitApi(), repositoryId, pullRequestId);
         let reportProcessor: ISonarQubeReportProcessor = new SonarQubeReportProcessor(logger);
-        return new PrcaOrchestrator(logger, reportProcessor, prcaService);
+        return new PrcaOrchestrator(logger, reportProcessor, prcaService, messageLimit);
     }
 
     /**
@@ -93,7 +100,7 @@ export class PrcaOrchestrator {
     public postSonarQubeIssuesToPullRequest(sqReportPath: string): Promise<void> {
         this.logger.LogDebug(`SonarQube report path: ${sqReportPath}`);
         if (sqReportPath === undefined || sqReportPath === null) {
-            // Looks like: "Make sure a SonarQube-enabled build task ran before this step."
+            // Looks like: "Make sure a Maven or Gradle ran before this step and SonarQube was enabled."
             return Promise.reject(tl.loc('Error_NoReportPathFound'));
         }
 
