@@ -1,8 +1,8 @@
 {
-  "name": "Agent.Tasks.PRCA",
+  "name": "vsts-tasks-sqpullrequestcodeanalysis",
   "version": "0.1.0",
   "author": "Microsoft Corporation",
-  "description": "Post code analysis issues as comments on a pull request",
+  "description": "Post issues detected by SonarQube as comments on a pull request. Supports Maven and Gradle.",
   "repository": {
     "type": "git",
     "url": "git+ssh://git@github.com/Microsoft/vsts-tasks.git"
@@ -16,9 +16,9 @@
     "mocha": "^2.5.3"
   },
   "dependencies": {
-    "fs": "0.0.2",
-    "q": "1.4.1",
+    "fs": "^0.0.2",
+    "q": "^1.4.1",
     "vso-node-api": "5.1.1",
-    "vsts-task-lib": "0.9.20"
+    "vsts-task-lib": "^0.9.20"
   }
 }

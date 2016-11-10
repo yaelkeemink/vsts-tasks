@@ -1,6 +1,4 @@
-/// <reference path="../typings/index.d.ts" />
-
-import * as path from 'path';
+import path = require('path');
 
 import tl = require('vsts-task-lib/task');
 import * as web from 'vso-node-api/WebApi';
