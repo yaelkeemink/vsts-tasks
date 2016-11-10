@@ -7,10 +7,11 @@ import fs = require("fs");
 import util = require("util");
 
 import env = require("./Environment");
+import deployAzureRG = require("./DeployAzureRG");
 
 var parameterParse = require("./parser").parse;
 var armResource = require("azure-arm-resource");
-
+var request = require("sync-request");
 
 export class ResourceGroup {
 
@@ -26,30 +27,35 @@ export class ResourceGroup {
     private connectedService:string;
     private deploymentMode:string;
     private outputVariable:string;
+    private csmFileLink:string;
+    private csmParametersFileLink:string;
+    private templateLocation:string;
     private credentials;
     
     private networkInterfaces;
     private publicAddresses;
     private virtualMachines;
     
-    constructor(action, connectedService, credentials, resourceGroupName, location, csmFile, csmParametersFile, overrideParameters, subscriptionId, deploymentMode, outputVariable) {
-            this.connectedService = connectedService;
-            this.action = action;
-            this.resourceGroupName = resourceGroupName;
-            this.location = location;
-            this.csmFile = csmFile;
-            this.csmParametersFile = csmParametersFile;
-            this.overrideParameters = overrideParameters;
-            this.subscriptionId = subscriptionId;    
-            this.deploymentMode = deploymentMode
-            this.credentials = credentials;
-            this.outputVariable = outputVariable;
+constructor(deployRGObj: deployAzureRG.AzureResourceGroupDeployment) {
+            this.connectedService = deployRGObj.connectedService;
+            this.action = deployRGObj.action;
+            this.resourceGroupName = deployRGObj.resourceGroupName;
+            this.location = deployRGObj.location;
+            this.csmFile = deployRGObj.csmFile;
+            this.csmParametersFile = deployRGObj.csmParametersFile;
+            this.overrideParameters = deployRGObj.overrideParameters;
+            this.subscriptionId = deployRGObj.subscriptionId;    
+            this.deploymentMode = deployRGObj.deploymentMode
+            this.credentials = deployRGObj.credentials;
+            this.outputVariable = deployRGObj.outputVariable;
+            this.csmFileLink = deployRGObj.csmFileLink;
+            this.csmParametersFileLink = deployRGObj.csmParametersFileLink;
+            this.templateLocation = deployRGObj.templateLocation;
             this.networkInterfaces = null;
             this.publicAddresses = null;
             this.virtualMachines = null;
             this.execute();
     }
-
     private execute() {
         switch(this.action) {
            case "Create Or Update Resource Group": 
@@ -76,8 +82,7 @@ export class ResourceGroup {
     private updateOverrideParameters(params) {
         var override = parameterParse(this.overrideParameters);
         for (var key in override) {
-            if (params[key] != undefined)
-                params[key]["value"] = override[key];
+                params[key] = override[key];
         }
         return params;
     }
@@ -108,6 +113,31 @@ export class ResourceGroup {
         });
     }
     
+    private getDeploymentDataForExternalLinks() {
+        var properties = {}
+        properties["templateLink"] = {"uri" : this.csmFileLink};
+        if (this.csmParametersFileLink && this.csmParametersFileLink.trim()!="" && this.overrideParameters.trim()=="")
+            properties["parametersLink"] = {"uri" : this.csmParametersFileLink };
+        else {
+            var params = {};
+            if (this.csmParametersFileLink && this.csmParametersFileLink.trim()!="") {
+                var response = request("GET", this.csmParametersFileLink);
+                try { 
+                    params = JSON.parse(response.body).parameters;
+                } catch(error) {
+                    tl.setResult(tl.TaskResult.Failed, "Make sure the end point is a JSON");
+                }
+            }
+            params = this.updateOverrideParameters(params);
+            properties["parameters"] = params;
+        }
+        properties["mode"] = this.deploymentMode;
+        properties["debugSetting"] = {"detailLevel": "requestContent, responseContent"};
+        var deployment = {"properties": properties};
+        deployment["location"] = this.location;
+        return deployment;
+    }
+    
     private getParametersFromTemplate(template) {
         var params = {};
         for (var key in template.parameters) {
@@ -116,7 +146,7 @@ export class ResourceGroup {
         return params;
     }
 
-    private createTemplateDeployment(armClient) {
+    private getDeploymentDataForLinkedArtifact() {
         var template;
         try { 
             template= JSON.parse(fs.readFileSync(this.csmFile, 'UTF-8'));
@@ -147,6 +177,16 @@ export class ResourceGroup {
         properties["debugSetting"] = {"detailLevel": "requestContent, responseContent"};
         var deployment = {"properties": properties};
         deployment["location"] = this.location;
+        return deployment;
+    }
+
+    private createTemplateDeployment(armClient) {
+        var deployment;
+        if (this.templateLocation === "Linked Artifact") {
+            deployment = this.getDeploymentDataForLinkedArtifact();
+        } else {
+            deployment = this.getDeploymentDataForExternalLinks();
+        }
         armClient.deployments.createOrUpdate(this.resourceGroupName, this.createDeploymentName(this.csmFile), deployment, null, (error, result, request, response) => {
             if (error) {
                 tl.setResult(tl.TaskResult.Failed, tl.loc("RGO_createTemplateDeploymentFailed", error.message));
@@ -162,7 +202,6 @@ export class ResourceGroup {
             tl.setResult(tl.TaskResult.Succeeded, tl.loc("RGO_createTemplateDeploymentSucceeded", this.resourceGroupName));
         });
     }
-
     private deleteResourceGroup() {
         var armClient = new armResource.ResourceManagementClient(this.credentials, this.subscriptionId);
         console.log(tl.loc("ARG_DeletingResourceGroup", this.resourceGroupName));

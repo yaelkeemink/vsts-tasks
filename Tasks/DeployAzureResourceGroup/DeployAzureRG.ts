@@ -13,28 +13,24 @@ import virtualMachine = require("./VirtualMachine");
 import resourceGroup = require("./ResourceGroup");
 import env = require("./Environment");
 
-try {
-    tl.setResourcePath(path.join( __dirname, "task.json"));
-}
-catch (err) {
-    tl.setResult(tl.TaskResult.Failed, tl.loc("TaskNotFound", err));
-    process.exit();
-}
-
 export class AzureResourceGroupDeployment {
 
-    private action:string;
-    private resourceGroupName:string;
-    private location:string;
-    private csmFile:string;
-    private csmParametersFile:string;
-    private overrideParameters:string;
-    private enableDeploymentPrerequisites:boolean;
-    private outputVariable:string;
-    private subscriptionId:string;
-    private connectedService:string;
-    private isLoggedIn:boolean = false;
-    private deploymentMode:string;
+    public action:string;
+    public resourceGroupName:string;
+    public location:string;
+    public csmFile:string;
+    public csmParametersFile:string;
+    public templateLocation:string;
+    public csmFileLink:string;
+    public csmParametersFileLink:string;
+    public overrideParameters:string;
+    public enableDeploymentPrerequisites:boolean;
+    public outputVariable:string;
+    public subscriptionId:string;
+    public connectedService:string;
+    public isLoggedIn:boolean = false;
+    public deploymentMode:string;
+    public credentials;
     
     constructor() {
         try { 
@@ -45,11 +41,15 @@ export class AzureResourceGroupDeployment {
             this.location = tl.getInput("location");
             this.csmFile = tl.getPathInput("csmFile");
             this.csmParametersFile = tl.getPathInput("csmParametersFile");
+            this.csmFileLink = tl.getInput("csmFileLink");
+            this.csmParametersFileLink = tl.getInput("csmParametersFileLink");
+            this.templateLocation = tl.getInput("templateLocation");
             this.overrideParameters = tl.getInput("overrideParameters");
             this.enableDeploymentPrerequisites = tl.getBoolInput("enableDeploymentPrerequisites");
             this.outputVariable = tl.getInput("outputVariable");
             this.subscriptionId = tl.getEndpointDataParameter(this.connectedService, "SubscriptionId", true);    
             this.deploymentMode = tl.getInput("deploymentMode");
+            this.credentials = this.getARMCredentials();
         }
         catch (error) {
             tl.setResult(tl.TaskResult.Failed, tl.loc("ARGD_ConstructorFailed", error.message));
@@ -61,7 +61,7 @@ export class AzureResourceGroupDeployment {
            case "Create Or Update Resource Group": 
            case "DeleteRG":
            case "Select Resource Group":
-                new resourceGroup.ResourceGroup(this.action, this.connectedService, this.getARMCredentials(), this.resourceGroupName, this.location, this.csmFile, this.csmParametersFile, this.overrideParameters, this.subscriptionId, this.deploymentMode, this.outputVariable);
+                new resourceGroup.ResourceGroup(this);
                 break;
            case "Start":
            case "Stop":
@@ -84,6 +84,3 @@ export class AzureResourceGroupDeployment {
     }
 }
 
-
-var azureResourceGroupDeployment = new AzureResourceGroupDeployment();
-azureResourceGroupDeployment.execute();
