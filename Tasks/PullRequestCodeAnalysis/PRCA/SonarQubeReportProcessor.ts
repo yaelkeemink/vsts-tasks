@@ -42,13 +42,13 @@ export class SonarQubeReportProcessor implements ISonarQubeReportProcessor {
             throw new PRInjectorError('Could not parse the SonarQube report file. The error is: ' + e.message);
         }
 
-        let componentMap = this.BuildComponentMap(sonarQubeReport);
-        return this.BuildMessages(sonarQubeReport, componentMap);
+        let componentMap = this.buildComponentMap(sonarQubeReport);
+        return this.buildMessages(sonarQubeReport, componentMap);
     }
 
     /* Helper methods */
 
-    private BuildComponentMap(sonarQubeReport: any): Map<string, string> {
+    private buildComponentMap(sonarQubeReport: any): Map<string, string> {
         let map: Map<string, string> = new Map();
 
         if (!sonarQubeReport.components) {
@@ -66,7 +66,7 @@ export class SonarQubeReportProcessor implements ISonarQubeReportProcessor {
 
                 if (component.moduleKey != null) { // if the component belongs to a module, we need to prepend the module path
                     // #TODO: Support nested modules once the SonarQube report correctly lists moduleKey in nested modules
-                    var module: any = this.GetObjectWithKey(sonarQubeReport.components, component.moduleKey);
+                    var module: any = this.getObjectWithKey(sonarQubeReport.components, component.moduleKey);
                     if (module.path != null) { // some modules do not list a path
                         fullPath = path.join(module.path, component.path);
                     }
@@ -81,7 +81,7 @@ export class SonarQubeReportProcessor implements ISonarQubeReportProcessor {
         return map;
     }
 
-    private BuildMessages(sonarQubeReport: any, componentMap: Map<string, string>): Message[] {
+    private buildMessages(sonarQubeReport: any, componentMap: Map<string, string>): Message[] {
 
         let messages: Message[] = [];
 
@@ -116,7 +116,7 @@ export class SonarQubeReportProcessor implements ISonarQubeReportProcessor {
                 throw new PRInjectorError(`Invalid SonarQube report - an issue belongs to an invalid component. Content ${issue.content}`);
             }
 
-            let message: Message = this.BuildMessage(filePath, issue);
+            let message: Message = this.buildMessage(filePath, issue);
 
             if (message) {
                 messages.push(message);
@@ -147,11 +147,11 @@ export class SonarQubeReportProcessor implements ISonarQubeReportProcessor {
     }
 
     // todo: filter out assembly level issues ?
-    private BuildMessage(path: string, issue: any): Message {
+    private buildMessage(path: string, issue: any): Message {
 
         // todo: more checks for rule and message 
         let content: string =`${issue.message}, ${issue.rule}`;
-        let priority: number = this.GetPriority(issue);
+        let priority: number = this.getPriority(issue);
 
         if (!issue.line) {
             this.logger.LogWarning(
@@ -171,7 +171,7 @@ export class SonarQubeReportProcessor implements ISonarQubeReportProcessor {
         return message;
     }
 
-    private GetPriority(issue: any) {
+    private getPriority(issue: any) {
 
         let severity: string = issue.severity;
         if (!severity) {
@@ -201,7 +201,7 @@ export class SonarQubeReportProcessor implements ISonarQubeReportProcessor {
      * @param searchKey
      * @returns {any} Null if object not found, otherwise the first object with a "key" field matching searchKey.
      */
-    private GetObjectWithKey(sonarQubeReportSection: any, searchKey: string): any {
+    private getObjectWithKey(sonarQubeReportSection: any, searchKey: string): any {
 
         if (!sonarQubeReportSection) {
             return null;
