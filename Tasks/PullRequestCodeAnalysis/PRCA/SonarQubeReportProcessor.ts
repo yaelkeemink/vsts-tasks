@@ -1,8 +1,5 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import * as util from 'util';
-
-
 
 import { PRInjectorError } from './PRInjectorError';
 import { Message } from './Message';
@@ -65,13 +62,13 @@ export class SonarQubeReportProcessor implements ISonarQubeReportProcessor {
             }
 
             if (component.path != null) {
-                var fullPath = component.path;
+                let fullPath: string = component.path;
 
                 if (component.moduleKey != null) { // if the component belongs to a module, we need to prepend the module path
                     // #TODO: Support nested modules once the SonarQube report correctly lists moduleKey in nested modules
-                    var module:any = this.GetObjectWithKey(sonarQubeReport.components, component.moduleKey);
+                    var module: any = this.GetObjectWithKey(sonarQubeReport.components, component.moduleKey);
                     if (module.path != null) { // some modules do not list a path
-                        fullPath = path.join(module.path, component.path); 
+                        fullPath = path.join(module.path, component.path);
                     }
                 }
 
@@ -79,10 +76,7 @@ export class SonarQubeReportProcessor implements ISonarQubeReportProcessor {
             }
         }
 
-        this.logger.LogDebug(
-            util.format(
-                'The SonarQube report contains %d components with paths',
-                map.size));
+        this.logger.LogDebug(`The SonarQube report contains ${map.size} components with paths`);
 
         return map;
     }
@@ -106,23 +100,20 @@ export class SonarQubeReportProcessor implements ISonarQubeReportProcessor {
             return issue.isNew === true;
         });
 
-        this.logger.LogInfo(
-            util.format('The SonarQube report contains %d issues, out of which %d are new.', issueCount, newIssues.length)
-        );
+        this.logger.LogInfo(`The SonarQube report contains ${issueCount} issues, out of which ${newIssues.length} are new.`);
 
         for (var issue of newIssues) {
             let issueComponent = issue.component;
 
             if (!issueComponent) {
-                throw new PRInjectorError(
-                    util.format('Invalid SonarQube report - an issue does not have the component attribute. Content "%s"', issue.content));
+                throw new PRInjectorError(`Invalid SonarQube report - an issue does not have the component attribute. Content {$issue.content}`);
             }
 
             let filePath: string = componentMap.get(issueComponent);
+            filePath = this.normalizeIssuePath(filePath);
 
             if (!filePath) {
-                throw new PRInjectorError(
-                    util.format('Invalid SonarQube report - an issue belongs to an invalid component. Content "%s"', issue.content));
+                throw new PRInjectorError(`Invalid SonarQube report - an issue belongs to an invalid component. Content ${issue.content}`);
             }
 
             let message: Message = this.BuildMessage(filePath, issue);
@@ -136,20 +127,35 @@ export class SonarQubeReportProcessor implements ISonarQubeReportProcessor {
         return messages;
     }
 
+    
+    /**
+     * SQ for Maven / Gradle seem to produce inconsistent paths  
+     */
+    private normalizeIssuePath(filePath: string) {
+
+        if (!filePath) {
+            return;
+        }
+
+        filePath = filePath.replace(/\\/g, '/');
+
+        if (!filePath.startsWith('/')) {
+            filePath = '/' + filePath;
+        }
+
+        return filePath;
+    }
+
     // todo: filter out assembly level issues ?
     private BuildMessage(path: string, issue: any): Message {
 
         // todo: more checks for rule and message 
-        let content: string = util.format('%s (%s)', issue.message, issue.rule);
+        let content: string =`${issue.message}, ${issue.rule}`;
         let priority: number = this.GetPriority(issue);
 
         if (!issue.line) {
             this.logger.LogWarning(
-                util.format(
-                    'A SonarQube issue does not have an associated line and will be ignored. File "%s". Content "%s". ',
-                    content,
-                    path));
-
+                    `A SonarQube issue does not have an associated line and will be ignored. File ${path}. Content ${content}`);
             return null;
         }
 
@@ -157,12 +163,7 @@ export class SonarQubeReportProcessor implements ISonarQubeReportProcessor {
 
         if (line < 1) {
             this.logger.LogWarning(
-                util.format(
-                    'A SonarQube issue was reported on line %d and will be ignored. File "%s". Content "%s".',
-                    line,
-                    path,
-                    content));
-
+                    `A SonarQube issue was reported on line ${line} and will be ignored. File ${path}. Content ${content}`);
             return null;
         }
 
@@ -174,7 +175,7 @@ export class SonarQubeReportProcessor implements ISonarQubeReportProcessor {
 
         let severity: string = issue.severity;
         if (!severity) {
-            this.logger.LogDebug(util.format('Issue %d does not have a priority associated', issue.content));
+            this.logger.LogDebug(`Issue ${issue.content} does not have a priority associated` );
             severity = 'none';
         }
 
