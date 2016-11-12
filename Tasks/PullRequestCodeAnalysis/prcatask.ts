@@ -1,4 +1,6 @@
 import path = require('path');
+import glob = require('glob');
+
 import tl = require('vsts-task-lib/task');
 import { PrcaOrchestrator } from './PRCA/PrcaOrchestrator';
 import { TaskLibLogger } from './TaskLibLogger';
@@ -6,6 +8,7 @@ import { TaskLibLogger } from './TaskLibLogger';
 tl.setResourcePath(path.join(__dirname, 'task.json'));
 
 stopOnNonPrBuild();
+let report: string = findSQReportByName();
 
 var orchestrator: PrcaOrchestrator = PrcaOrchestrator.Create(
     new TaskLibLogger(),
@@ -15,30 +18,52 @@ var orchestrator: PrcaOrchestrator = PrcaOrchestrator.Create(
     getPullRequestId(),
     getMessgeLimit());
 
-orchestrator.postSonarQubeIssuesToPullRequest(tl.getVariable('PRCA_REPORT_PATH'))
+orchestrator.postSonarQubeIssuesToPullRequest(report)
     .then(() => {
         tl.setResult(tl.TaskResult.Succeeded, tl.loc('Info_ResultSuccess')); // Set task success
     })
     .catch((error: any) => {
-        tl.debug(`Task failed with the following error: ${error}`);
+        tl.error(`Task failed with the following error: ${error}`);
         // Looks like: "Pull Request Code Analysis failed."
         tl.setResult(tl.TaskResult.Failed, tl.loc('Info_ResultFail')); // Set task failure
     });
 
+function findSQReportByName(): string {
 
+    let reportGlob = path.join(tl.getVariable('build.sourcesDirectory'), '**', 'sonar-report.json');
+    let reportGlobResults: string[] = glob.sync(reportGlob);
 
+    tl.debug(`[PRCA] Searching for ${reportGlob} - found ${reportGlobResults.length} file(s)`);
+
+    if (reportGlobResults.length === 0) {
+        tl.setResult(tl.TaskResult.Failed, tl.loc('Error_NoReport')); // Set task failure
+        process.exit(1);
+    }
+
+    if (reportGlobResults.length > 1) {
+        tl.warning(tl.loc('sqAnalysis_MultipleReportTasks'));
+    }
+
+    tl.debug(`[PRCA] Using ${reportGlobResults[0]}`);
+    return reportGlobResults[0];
+}
 
 function stopOnNonPrBuild() {
+
+    tl.debug("[PRCA] Checking if this is a PR build");
 
     let sourceBranch: string = tl.getVariable('Build.SourceBranch');
     if (!sourceBranch.startsWith('refs/pull/')) {
         // Looks like: "Skipping pull request commenting - this build was not triggered by a pull request."
-        console.log(tl.loc('Error_NotPullRequest'));
+        console.log(tl.loc('Info_NotPullRequest'));
         process.exit();
     }
 }
 
 function getPullRequestId() {
+
+    tl.debug("[PRCA] Getting the PR Id");
+
     let sourceBranch: string = tl.getVariable('Build.SourceBranch');
     var pullRequestId: number = Number.parseInt(sourceBranch.replace('refs/pull/', ''));
 
@@ -65,10 +90,13 @@ function getMessgeLimit(): number {
         process.exit(1);
     }
 
+    tl.debug("[PRCA] The message limit is: " + messageLimit);
     return messageLimit;
 }
 
 function getBearerToken() {
+
+    tl.debug("[PRCA] Getting the agent bearer token");
 
     // Get authentication from the agent itself
     var auth = tl.getEndpointAuthorization("SYSTEMVSSCONNECTION", false);

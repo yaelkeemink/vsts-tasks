@@ -71,11 +71,11 @@ export class SonarQubeReportProcessor implements ISonarQubeReportProcessor {
                     // #TODO: Support nested modules once the SonarQube report correctly lists moduleKey in nested modules
                     var module:any = this.GetObjectWithKey(sonarQubeReport.components, component.moduleKey);
                     if (module.path != null) { // some modules do not list a path
-                        fullPath = path.join('/', module.path, component.path); // paths must start with a path seperator
+                        fullPath = path.join(module.path, component.path); 
                     }
                 }
 
-                map.set(component.key, path.normalize(fullPath));
+                map.set(component.key, '/' + fullPath); // the PR file paths have a leading separator
             }
         }
 
@@ -118,14 +118,14 @@ export class SonarQubeReportProcessor implements ISonarQubeReportProcessor {
                     util.format('Invalid SonarQube report - an issue does not have the component attribute. Content "%s"', issue.content));
             }
 
-            let path: string = componentMap.get(issueComponent);
+            let filePath: string = componentMap.get(issueComponent);
 
-            if (!path) {
+            if (!filePath) {
                 throw new PRInjectorError(
                     util.format('Invalid SonarQube report - an issue belongs to an invalid component. Content "%s"', issue.content));
             }
 
-            let message: Message = this.BuildMessage(path, issue);
+            let message: Message = this.BuildMessage(filePath, issue);
 
             if (message) {
                 messages.push(message);

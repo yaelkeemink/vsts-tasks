@@ -9,6 +9,7 @@
   "loc.messages.Error_InvalidMessageLimit": "Expected message limit to be a positive integer, but instead it was %s",
   "loc.messages.Error_InvalidPullRequestId": "Could not retrieve pull request ID from the server.",
   "loc.messages.Error_FailedToGetAuthToken": "Could not get an authentication token from the build agent.",
+  "loc.messages.Error_NoReport": "Could not find the SonarQube report file. Possible cause: the Maven or Gradle task did not complete the SonarQube analysis.",
   "loc.messages.Info_NotPullRequest": "Skipping pull request commenting - this build was not triggered by a pull request.",
   "loc.messages.Info_ResultFail_FailedToGetModifiedFiles": "Failed to get the files modified by the pull request.",
   "loc.messages.Info_ResultFail_FailedToDeleteOldComments": "Failed to delete previous PRCA comments.",
