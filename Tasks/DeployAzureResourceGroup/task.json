@@ -14,30 +14,13 @@
     "version": {
         "Major": 2,
         "Minor": 0,
-        "Patch": 0
+        "Patch": 7
     },
     "demands": [
         "node.js"
     ],
     "minimumAgentVersion": "2.0.0",
     "groups": [
-        {
-            "name": "AzureDetails",
-            "displayName": "Azure Details",
-            "isExpanded": true
-        },
-        {
-            "name": "Template",
-            "displayName": "Template",
-            "isExpanded": true,
-            "visibleRule": "action = Create Or Update Resource Group"
-        },
-        {
-            "name": "AdvancedDeploymentOptions",
-            "displayName": "Advanced Deployment Options",
-            "isExpanded": true,
-            "visibleRule": "action = Create Or Update Resource Group || action = Select Resource Group"
-        },
         {
             "name": "output",
             "displayName": "Output",
@@ -46,12 +29,12 @@
     ],
     "inputs": [
         {
+
             "name": "ConnectedServiceName",
             "type": "connectedService:AzureRM",
             "label": "Azure subscription",
             "defaultValue": "",
             "required": true,
-            "groupName": "AzureDetails",
             "helpMarkDown": "Select the Azure Resource Manager subscription for the deployment."
         },
         {
@@ -61,7 +44,6 @@
             "defaultValue": "Create or update resource group",
             "required": true,
             "helpMarkDown": "Action to be performed on the Azure resources or resource group.",
-            "groupName": "AzureDetails",
             "options": {
                 "Create or update resource group": "Create or update resource group",
                 "Select resource group": "Select resource group",
@@ -78,7 +60,6 @@
             "label": "Resource group",
             "required": true,
             "helpMarkDown": "Provide the name of a resource group.",
-            "groupName": "AzureDetails",
             "properties": {
                 "EditableOptions": "True"
             }
@@ -90,7 +71,6 @@
             "defaultValue": "East US",
             "required": true,
             "helpMarkDown": "Location for deploying the resource group. If the resource group already exists in the subscription, then this value will be ignored.",
-            "groupName": "AzureDetails",
             "options": {
                 "Australia East": "Australia East",
                 "Australia Southeast": "Australia Southeast",
@@ -159,7 +139,7 @@
             "defaultValue": "",
             "required": true,
             "helpMarkDown": "Specify the path to the Azure Resource Manager template. For more information about the templates see https://aka.ms/azuretemplates. To get started immediately use template https://aka.ms/sampletemplate.",
-            "groupName": "Template"
+            "visibleRule": "action = Create or update resource group && templateLocation = Linked artifact"
         },
         {
             "name": "csmParametersFile",
@@ -168,7 +148,7 @@
             "defaultValue": "",
             "required": false,
             "helpMarkDown": "Specify the path for the parameters file for the Azure Resource Manager template.",
-            "groupName": "Template"
+            "visibleRule": "action = Create or update resource group && templateLocation = Linked artifact"
         },
         {
             "name": "overrideParameters",
@@ -180,7 +160,7 @@
             "properties": {
                 "editorExtension": "ms.vss-distributed-task-input-editor.parameters-grid"
             },
-            "groupName": "Template"
+            "visibleRule": "action = Create or update resource group"
         },
         {
             "name": "deploymentMode",
@@ -188,7 +168,6 @@
             "label": "Deployment mode",
             "defaultValue": "Incremental",
             "required": true,
-            "groupName": "AzureDetails",
             "helpMarkDown": "Incremental mode handles deployments as incremental updates to the resource group . It leaves unchanged resources that exist in the resource group but are not specified in the template. \n\n Complete mode deletes resources that are not in your template. \n\n Validate mode enables you to find problems with the template before creating actual resources. \n\n By default, Incremental mode is used.",
             "options": {
                 "Incremental": "Incremental",
@@ -199,12 +178,44 @@
         },
         {
             "name": "enableDeploymentPrerequisites",
-            "type": "boolean",
+            "type": "pickList",
             "label": "Enable deployment prerequisites",
-            "defaultValue": "false",
-            "required": false,
-            "groupName": "AdvancedDeploymentOptions",
+            "defaultValue": "Configure VM agent with Machine Group Agent",
+            "visibleRule": "action = Create or update resource group || action = Select resource group",
+            "required": true,
+            "options": {
+                "None": "None",
+                "Configure VM agent with Machine Group Agent": "Configure VM agent with Machine Group Agent",
+                "Configure VM with Win RM": "Configure VM with Win RM"
+            },
             "helpMarkDown": "Enabling this option configures Windows Remote Management (WinRM) listener over HTTPS protocol on port 5986, using a self-signed certificate. This configuration is required for performing deployment operation on Azure machines. If the target Virtual Machines are backed by a Load balancer, ensure Inbound NAT rules are configured for target port (5986)."
+        },
+        {
+            "name": "machineGroupName",
+            "type": "pickList",
+            "label": "Machine group",
+            "visibleRule": "enableDeploymentPrerequisites = Configure VM agent with Machine Group Agent",
+            "required": true,
+            "helpMarkDown": "Select a machine group"
+        },
+        {
+            "name": "copyAzureVMTags",
+            "type": "boolean",
+            "label": "Copy Azure virtual machine tags",
+            "defaultValue": false,
+            "visibleRule": "enableDeploymentPrerequisites = Configure VM agent with Machine Group Agent",
+            "required": false,
+            "helpMarkDown": "Enabling this option copies the virtual machine tags and configures a machine group agent with those tags."
+
+        },
+        {
+            "name": "vstsPATToken",
+            "type": "string",
+            "label": "VSTS pat token",
+            "defaultValue": "",
+            "visibleRule": "enableDeploymentPrerequisites = Configure VM agent with Machine Group Agent",            
+            "required": true,
+            "helpMarkDown": "Provide PAT token."
         },
         {
             "name": "outputVariable",
@@ -221,6 +232,14 @@
             "target": "resourceGroupName",
             "endpointId": "$(ConnectedServiceName)",
             "dataSourceName": "AzureResourceGroups"
+        }
+    ],
+    "sourceDefinitions": [
+        {
+            "target": "machineGroupName",
+            "endpoint": "/$(system.teamProject)/_apis/distributedtask/machinegroups",
+            "selector": "jsonpath:$.value[*].name",
+            "authKey": "tfs:teamfoundation"
         }
     ],
     "instanceNameFormat": "Azure Deployment:$(action) action on $(resourceGroupName)",

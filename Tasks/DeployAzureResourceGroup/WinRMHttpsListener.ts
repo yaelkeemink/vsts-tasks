@@ -6,7 +6,7 @@ import tl = require("vsts-task-lib/task");
 import azure_utils = require("./AzureUtil");
 import deployAzureRG = require("./DeployAzureRG");
 
-export class WinRMHttpsListener {
+    export class WinRMHttpsListener {
     private taskParameters: deployAzureRG.AzureRGTaskParameters;
     private resourceGroupName: string;
     private credentials;
