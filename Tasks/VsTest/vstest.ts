@@ -257,7 +257,12 @@ function uploadTestResults(testResultsDirectory: string): Q.Promise<string> {
     selectortool.arg("UpdateTestResults");
     selectortool.arg("/TfsTeamProjectCollection:" + tl.getVariable("System.TeamFoundationCollectionUri"));
     selectortool.arg("/ProjectId:" + tl.getVariable("System.TeamProject"));
-    selectortool.arg("/buildid:" + tl.getVariable("Build.BuildId"));
+    if (context === "CD") {
+        selectortool.arg("/buildid:" + tl.getVariable("Release.ReleaseId"));
+    }
+    else {
+        selectortool.arg("/buildid:" + tl.getVariable("Build.BuildId"));
+    }
     selectortool.arg("/token:" + tl.getEndpointAuthorizationParameter("SystemVssConnection", "AccessToken", false));
 
     if (resultFiles && resultFiles[0]) {
