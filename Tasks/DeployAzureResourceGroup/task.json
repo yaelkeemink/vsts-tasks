@@ -266,8 +266,8 @@
         "FailedAddingNSGRule3Times": "Failed to add the network security rule to the security group %s after trying 3 times",
         "FailedToAddNetworkSecurityRule": "Failed to add the network security rule to the security group %s",
         "FailedToEnablePrereqs": "Failed to enable prerequisites",
-        "FailedToFetchInstanceViewVM": "Failed to fetch the instance view of the virtual machine",
-        "CreationOfExtensionFailed": "Failed to add the extension",
+        "FailedToFetchInstanceViewVM": "Failed to fetch the instance view of the virtual machine. Error : %s",
+        "CreationOfExtensionFailed": "Failed to add the extension. Error: %s",
         "FailedToDeleteExtension": "Deletion of extension failed",
         "AddedTargetInboundNatRuleLB": "Added the target virtual machine for the inbound NAT rules of load balancer %s",
         "AddedInboundNatRuleLB": "Adding inbound NAT rule to the load balancer %s ",
@@ -297,7 +297,10 @@
         "NetworkSecurityGroupNameCannotBeNull": "networkSecurityGroupName cannot be null or undefined and it must be of type string.",
         "SecurityRuleNameCannotBeNull": "securityRuleName cannot be null or undefined and it must be of type string.",
         "SecurityRuleParametersCannotBeNull": "securityRuleParameters cannot be null or undefined.",
-        
+        "InboundNatRuleAdditionFailed": "Addition of Inbound Nat Rule to the Load Balancer %s failed. Error: %s ",
+        "InboundNatRulesToNICFailed": "Addition of rule Id to the loadBalancerInboundNatRules of nic %s failed with the error: %s",
+        "AddingInboundNatRule": "Adding Inbound Nat Rule for the Network Interface %s to the Load Balancer %s",
+
         "ErrorFetchingNatRules": "Error while fetching Nat rules",
         "UnableToFetchFQDN": "Unable to fetch FQDN data from one or more VMs",
         "OutputVariableShouldNotBeEmpty": "Output variable should not be empty.",

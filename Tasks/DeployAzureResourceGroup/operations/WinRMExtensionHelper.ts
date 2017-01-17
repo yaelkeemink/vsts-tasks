@@ -147,11 +147,11 @@ export class WinRMExtensionHelper {
                     }
                 }
             }
-            console.log("Adding Inbound Nat Rule for the Network Interface %s to the Load Balancer %s", networkInterface.name, loadBalancer.name);
+            console.log(tl.loc("AddingInboundNatRule", networkInterface.name, loadBalancer.name));
             if (!!loadBalancer && !!networkInterface) {
                 this.networkClient.loadBalancers.createOrUpdate(this.resourceGroupName, loadBalancer.name, loadBalancer, null, (error, result, request, response) => {
                     if (error) {
-                        console.log("Addition of Inbound Nat Rule to the Load Balancer %s failed with the error: %s ", loadBalancer.name, JSON.stringify(error));
+                        console.log(tl.loc("InboundNatRuleAdditionFailed", loadBalancer.name, JSON.stringify(error)));
                         reject(utils.getError(error));
                     }
                     else {
@@ -163,7 +163,7 @@ export class WinRMExtensionHelper {
                         this.networkClient.networkInterfaces.createOrUpdate(this.resourceGroupName, networkInterface.name, networkInterface, null,
                             (error2, result2, request2, response2) => {
                                 if (error2) {
-                                    console.log("Addition of rule Id to the loadBalancerInboundNatRules of nic %s failed with the error: %s", networkInterface.name, JSON.stringify(error2));
+                                    console.log(tl.loc("InboundNatRulesToNICFailed", networkInterface.name, JSON.stringify(error2)));
                                     reject(utils.getError(error2));
                                     return;
                                 }
@@ -354,8 +354,8 @@ export class WinRMExtensionHelper {
         return new Promise<boolean>((resolve, reject) => {
             this.computeClient.virtualMachines.get(this.resourceGroupName, vmName, { expand: 'instanceView' }, async (error, result, request, response) => {
                 if (error) {
-                    console.log("Error in getting the instance view of the virtual machine " + util.inspect(error, { depth: null }));
-                    reject(tl.loc("FailedToFetchInstanceViewVM"));
+                    console.log(tl.loc("FailedToFetchInstanceViewVM", JSON.stringify(error)));
+                    reject(tl.loc("FailedToFetchInstanceViewVM", JSON.stringify(error)));
                     return;
                 }
                 tl.debug("Got the Instance View of the virtualMachine " + vmName + ": " + JSON.stringify(result));
@@ -406,8 +406,8 @@ export class WinRMExtensionHelper {
         return new Promise<any>((resolve, reject) => {
             this.computeClient.virtualMachineExtensions.createOrUpdate(this.resourceGroupName, vmName, extensionName, parameters, async (error, result, request, response) => {
                 if (error) {
-                    console.log("Failed to add the extension " + util.inspect(error, { depth: null }));
-                    reject(tl.loc("CreationOfExtensionFailed"));
+                    console.log(tl.loc("CreationOfExtensionFailed", JSON.stringify(error)));
+                    reject(tl.loc("CreationOfExtensionFailed", JSON.stringify(error)));
                     return;
                 }
                 tl.debug("Addition of extension completed for vm" + vmName);
