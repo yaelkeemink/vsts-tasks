@@ -46,6 +46,22 @@ export async function appOffineKuduService(publishUrl: string, physicalPath: str
 }
 
 /**
+ * Check whether the package contains parameter.xml file
+ * @param   webAppPackage   web deploy package
+ * @returns boolean
+ */
+export async  function containsParamFile(webAppPackage: string ) {
+    var isParamFilePresent = false;
+    var pacakgeComponent = await zipUtility.getArchivedEntries(webAppPackage);
+    if (((pacakgeComponent["entries"].indexOf("parameters.xml") > -1) || (pacakgeComponent["entries"].indexOf("Parameters.xml") > -1)) && 
+    ((pacakgeComponent["entries"].indexOf("systeminfo.xml") > -1) || (pacakgeComponent["entries"].indexOf("systemInfo.xml") > -1))) {
+        isParamFilePresent = true;
+    }
+    tl.debug("Is parameter file present in web package : " + isParamFilePresent);
+    return isParamFilePresent;
+}
+
+/**
  * Finds out virtual path and corresponding physical path mapping.
  * 
  * @param   virtualApplication Virtual Application details
@@ -114,21 +130,6 @@ export async function deployWebAppPackage(webAppPackage: string, publishingProfi
         }
     });
     return deferred.promise;
-}
-
-/**
- * Check whether the package contains parameter.xml file
- * @param   webAppPackage   web deploy package
- * @returns boolean
- */
-export async  function containsParamFile(webAppPackage: string ) {
-    var isParamFilePresent = false;
-    var pacakgeComponent = await zipUtility.getArchivedEntries(webAppPackage);
-    if ((pacakgeComponent["entries"].indexOf("parameters.xml") > -1) || (pacakgeComponent["entries"].indexOf("Parameters.xml") > -1)) {
-        isParamFilePresent = true;
-    }
-    tl.debug("Is parameter file present in web package : " + isParamFilePresent);
-    return isParamFilePresent;
 }
 
 export async function ensurePhysicalPathExists(publishingProfile, physicalPath: string) {

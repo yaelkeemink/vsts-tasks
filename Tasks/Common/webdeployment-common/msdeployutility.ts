@@ -3,6 +3,7 @@ import tl = require('vsts-task-lib/task');
 import trm = require('vsts-task-lib/toolrunner');
 import fs = require('fs');
 import path = require('path');
+var utility = require('./utility.js');
 
 var winreg = require('winreg');
 var parseString = require('xml2js').parseString;
@@ -98,25 +99,32 @@ export function getMSDeployCmdArgs(webAppPackage: string, webAppName: string, pu
  * @returns boolean
  */
 export async  function containsParamFile(webAppPackage: string ) {
-    var parameterFile = tl.getVariable('System.DefaultWorkingDirectory') + '\\' + 'parameter.xml';
-    var fd = fs.openSync(parameterFile, "w");
-    var outputObj = fs.createWriteStream("",{"fd": fd});
-    
-    try {
-        var msDeployCheckParamFileCmdArgs = "-verb:getParameters -source:package=\'" + webAppPackage + "\'";
-        await tl.exec("msdeploy", msDeployCheckParamFileCmdArgs, <any>{ failOnStdErr: true, outStream: outputObj });
-    }
-    catch(error) {
-        throw Error(error);
-    }
-    finally {
-        fs.fsyncSync(fd);
-        fs.closeSync(fd);
-    }
-
-    var paramContentXML = fs.readFileSync(parameterFile).toString();
-    paramContentXML = paramContentXML.slice(paramContentXML.indexOf('\n') + 1, paramContentXML.length);
+    //var parameterFile = tl.getVariable('System.DefaultWorkingDirectory') + '\\' + 'parameter.xml';
+    //var fd = fs.openSync(parameterFile, "w");
+    //var outputObj = fs.createWriteStream("",{"fd": fd});
     var isParamFilePresent = false;
+    //try {
+        var msDeployCheckParamFileCmdArgs = "-verb:getParameters -source:package=\'" + webAppPackage + "\'";
+        var res =  tl.execSync("msdeploy", msDeployCheckParamFileCmdArgs, <any>{ failOnStdErr: true, /*outStream: outputObj*/ });
+    //}
+    //catch(error) {
+        if((res.error && res.error.message.length > 0 ) || (res.stderr && res.stderr.length > 0)) {
+            isParamFilePresent = await utility.isMSDeployPackage(webAppPackage);
+            return isParamFilePresent;
+        }
+    //}
+    //finally {
+        /*if(res.stderr && res.stderr.length > 0) {
+            throw Error(res.stderr);
+        }*/
+        //fs.fsyncSync(fd);
+        //fs.closeSync(fd);
+    //}
+
+    var paramContentXML = res.stdout/*fs.readFileSync(parameterFile).toString();*/
+    //console.log("the parameter content is:");
+    //console.log(paramContentXML);
+    //paramContentXML = paramContentXML.slice(paramContentXML.indexOf('\n') + 1, paramContentXML.length);
 
     await parseString(paramContentXML, (error, result) => {
         if(error) {
@@ -128,7 +136,7 @@ export async  function containsParamFile(webAppPackage: string ) {
             }
         }
         else {
-            tl.warning("Unable to parse the content of parameterFile: "+parameterFile);
+            //tl.warning("Unable to parse the content of parameterFile: "+parameterFile);
             tl.debug("Parameter File Content is:");
             tl.debug(paramContentXML);
         }
@@ -136,7 +144,7 @@ export async  function containsParamFile(webAppPackage: string ) {
     });
 
     tl.debug("Is parameter file present in web package : " + isParamFilePresent);
-    tl.rmRF(parameterFile, true);
+    //tl.rmRF(parameterFile, true);
     return isParamFilePresent;
 }
 
@@ -219,6 +227,7 @@ export function redirectMSDeployErrorToConsole() {
     
     if(tl.exist(msDeployErrorFilePath)) {
         var errorFileContent = fs.readFileSync(msDeployErrorFilePath);
+        
         
         if(errorFileContent.toString().indexOf("ERROR_INSUFFICIENT_ACCESS_TO_SITE_FOLDER") !== -1) {
             tl.warning(tl.loc("Trytodeploywebappagainwithappofflineoptionselected"));
