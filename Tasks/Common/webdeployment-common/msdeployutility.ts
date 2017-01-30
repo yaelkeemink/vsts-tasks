@@ -4,6 +4,7 @@ import trm = require('vsts-task-lib/toolrunner');
 import fs = require('fs');
 import path = require('path');
 
+var zipUtility = require('webdeployment-common/ziputility.js');
 var winreg = require('winreg');
 var parseString = require('xml2js').parseString;
 
@@ -97,8 +98,8 @@ export function getMSDeployCmdArgs(webAppPackage: string, webAppName: string, pu
  * @param   webAppPackage   web deploy package
  * @returns boolean
  */
-export async  function containsParamFile(webAppPackage: string ) {
-    var parameterFile = tl.getVariable('System.DefaultWorkingDirectory') + '\\' + 'parameter.xml';
+export async  function containsParamFile(webAppPackage: string ): Promise<boolean> {
+    /*var parameterFile = tl.getVariable('System.DefaultWorkingDirectory') + '\\' + 'parameter.xml';
     var fd = fs.openSync(parameterFile, "w");
     var outputObj = fs.createWriteStream("",{"fd": fd});
     
@@ -137,8 +138,64 @@ export async  function containsParamFile(webAppPackage: string ) {
 
     tl.debug("Is parameter file present in web package : " + isParamFilePresent);
     tl.rmRF(parameterFile, true);
+    return isParamFilePresent;*/
+    var defer = Q.defer<boolean>();
+    var isParamFilePresentBackup = await isMSDeployPackage(webAppPackage);
+    var parameterFile = path.join(tl.getVariable('System.DefaultWorkingDirectory'), 'parameter.xml');
+    var ws = fs.createWriteStream(parameterFile);
+    ws.on('open', async(fd: number) => {
+        var msDeployCheckParamFileCmdArgs: string = "-verb:getParameters -source:package=\'" + webAppPackage + "\'";
+        try {
+            await tl.exec("msdeploy", msDeployCheckParamFileCmdArgs, <any>{ failOnStdErr: true, outStream: ws });
+        }
+        catch(error) {
+            defer.resolve(isParamFilePresentBackup);
+        }
+        ws.close();
+        ws.on('finish', async () => {
+            var paramContentXML = fs.readFileSync(parameterFile);
+            await parseString(paramContentXML, (error, result) => {
+                if(error) {
+                    defer.resolve(isParamFilePresentBackup);
+                }
+                else if(result != null && result['output'] != null && result['output']['parameters'] != null) {
+                    if(result['output']['parameters'][0]) {
+                        defer.resolve(true);
+                    }
+                }
+                else {
+                    defer.resolve(false);
+                }
+            });
+        })
+    });
+
+    return <Q.Promise<boolean>>defer.promise;
+}
+
+/**
+ * Check whether the package contains parameter.xml file
+ * @param   webAppPackage   web deploy package
+ * @returns boolean
+ */
+async function isMSDeployPackage(webAppPackage: string ) {
+    var isParamFilePresent = false;
+    let pacakgeComponent;
+    try {
+         pacakgeComponent = await zipUtility.getArchivedEntries(webAppPackage);
+    }
+    catch(error) {
+        return false;
+    }
+
+    if (((pacakgeComponent["entries"].indexOf("parameters.xml") > -1) || (pacakgeComponent["entries"].indexOf("Parameters.xml") > -1)) && 
+    ((pacakgeComponent["entries"].indexOf("systeminfo.xml") > -1) || (pacakgeComponent["entries"].indexOf("systemInfo.xml") > -1))) {
+        isParamFilePresent = true;
+    }
+    tl.debug("Is the package an msdeploy package : " + isParamFilePresent);
     return isParamFilePresent;
 }
+
 
 /**
  * Gets the full path of MSDeploy.exe
@@ -215,20 +272,19 @@ function getMSDeployInstallPath(registryKey: string): Q.Promise<string> {
  * 2. Checks if there is file in use error , suggest to try app offline.
  */
 export function redirectMSDeployErrorToConsole() {
-    var msDeployErrorFilePath = tl.getVariable('System.DefaultWorkingDirectory') + '\\error.txt';
+    var msDeployErrorFilePath = path.join(tl.getVariable('System.DefaultWorkingDirectory'),"error.txt");
     
     if(tl.exist(msDeployErrorFilePath)) {
-        var errorFileContent = fs.readFileSync(msDeployErrorFilePath);
-        
-        if(errorFileContent.toString().indexOf("ERROR_INSUFFICIENT_ACCESS_TO_SITE_FOLDER") !== -1) {
-            tl.warning(tl.loc("Trytodeploywebappagainwithappofflineoptionselected"));
+        var errorFileContent = fs.readFileSync(msDeployErrorFilePath).toString();
+        if(errorFileContent !== "") {
+            if(errorFileContent.toString().indexOf("ERROR_INSUFFICIENT_ACCESS_TO_SITE_FOLDER") !== -1) {
+                tl.warning(tl.loc("Trytodeploywebappagainwithappofflineoptionselected"));
+            }
+            if(errorFileContent.toString().indexOf("FILE_IN_USE") !== -1) {
+                tl.warning(tl.loc("Trytodeploywebappagainwithrenamefileoptionselected"));
+            }
+            tl.error(errorFileContent.toString());
+            tl.rmRF(msDeployErrorFilePath);
         }
-
-        if(errorFileContent.toString().indexOf("FILE_IN_USE") !== -1) {
-            tl.warning(tl.loc("Trytodeploywebappagainwithrenamefileoptionselected"));
-        }
-        
-        tl.error(errorFileContent.toString());
-        tl.rmRF(msDeployErrorFilePath);
     }
 }

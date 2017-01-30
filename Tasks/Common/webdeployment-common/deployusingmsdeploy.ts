@@ -1,6 +1,7 @@
 import tl = require('vsts-task-lib/task');
 import fs = require('fs');
 import path = require('path');
+import Q = require('q');
 
 var msDeployUtility = require('./msdeployutility.js');
 var utility = require('./utility.js');
@@ -20,8 +21,8 @@ var utility = require('./utility.js');
  * 
  */
 export async function DeployUsingMSDeploy(webDeployPkg, webAppName, publishingProfile, removeAdditionalFilesFlag, 
-        excludeFilesFromAppDataFlag, takeAppOfflineFlag, virtualApplication, setParametersFile, additionalArguments, isFolderBasedDeployment, useWebDeploy) {
-
+        excludeFilesFromAppDataFlag, takeAppOfflineFlag, virtualApplication, setParametersFile, additionalArguments, isFolderBasedDeployment, useWebDeploy): Promise<boolean> {
+    var defer = Q.defer<boolean>();
     var msDeployPath = await msDeployUtility.getMSDeployFullPath();
     var msDeployDirectory = msDeployPath.slice(0, msDeployPath.lastIndexOf('\\') + 1);
     var pathVar = process.env.PATH;
@@ -39,11 +40,37 @@ export async function DeployUsingMSDeploy(webDeployPkg, webAppName, publishingPr
         useWebDeploy);
 
     var errorFile = path.join(tl.getVariable('System.DefaultWorkingDirectory'),"error.txt");
-    var fd = fs.openSync(errorFile, "w");
-    var isErrorFileOpen = true;
-    var errObj = fs.createWriteStream("", {fd: fd} );
-     
-    try {
+    //var fd = fs.openSync(errorFile, "w");
+    //var isErrorFileOpen = true;
+    //var errObj = fs.createWriteStream("", {fd: fd} );
+     var errWs = fs.createWriteStream(errorFile);
+     errWs.on('open', async (fd: number) => {
+         try {
+             let rc: number = await tl.exec("msdeploy", msDeployCmdArgs, <any>{failOnStdErr: true, errStream: errWs});
+             if(publishingProfile != null) {
+                 console.log(tl.loc('WebappsuccessfullypublishedatUrl0', publishingProfile.destinationAppUrl));
+             }
+             defer.resolve(true);
+         }
+         catch(error) {
+             defer.reject(new Error(error.message));
+         }
+         finally {
+             errWs.close();
+             errWs.on('finish', () => {
+                 msDeployUtility.redirectMSDeployErrorToConsole();
+             });
+             process.env.PATH = pathVar;
+             if(setParametersFile != null) {
+                 tl.rmRF(setParametersFile, true);
+             }
+         }
+     });
+    
+    
+    
+    
+    /*try {
         await tl.exec("msdeploy", msDeployCmdArgs, <any>{failOnStdErr: true, errStream: errObj})
         if(publishingProfile != null) {
             console.log(tl.loc('WebappsuccessfullypublishedatUrl0', publishingProfile.destinationAppUrl));
@@ -67,5 +94,6 @@ export async function DeployUsingMSDeploy(webDeployPkg, webAppName, publishingPr
         if(setParametersFile != null) {
                 tl.rmRF(setParametersFile, true);
         }
-    }
+        }*/
+        return <Q.Promise<boolean>>defer.promise;
 }

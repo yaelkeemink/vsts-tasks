@@ -114,9 +114,14 @@ async function run() {
             }
             console.log("##vso[task.setvariable variable=websiteUserName;issecret=true;]" + publishingProfile.userName);
             console.log("##vso[task.setvariable variable=websitePassword;issecret=true;]" + publishingProfile.userPWD);
-            await msDeploy.DeployUsingMSDeploy(webDeployPkg, webAppName, publishingProfile, removeAdditionalFilesFlag,
+            try {
+            let rc: number = await msDeploy.DeployUsingMSDeploy(webDeployPkg, webAppName, publishingProfile, removeAdditionalFilesFlag,
                             excludeFilesFromAppDataFlag, takeAppOfflineFlag, virtualApplication, setParametersFile,
                             additionalArguments, isFolderBasedDeployment, useWebDeploy);
+            }
+            catch(error) {
+                throw error;
+            }
         } else {
             tl.debug("Initiated deployment via kudu service for webapp package : " + webDeployPkg);
             if(azureWebAppDetails == null) {
