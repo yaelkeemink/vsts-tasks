@@ -22,28 +22,29 @@ var utility = require('./utility.js');
  */
 export async function DeployUsingMSDeploy(webDeployPkg, webAppName, publishingProfile, removeAdditionalFilesFlag, 
         excludeFilesFromAppDataFlag, takeAppOfflineFlag, virtualApplication, setParametersFile, additionalArguments, isFolderBasedDeployment, useWebDeploy): Promise<boolean> {
-    var defer = Q.defer<boolean>();
-    var msDeployPath = await msDeployUtility.getMSDeployFullPath();
-    var msDeployDirectory = msDeployPath.slice(0, msDeployPath.lastIndexOf('\\') + 1);
-    var pathVar = process.env.PATH;
+    let defer: Q.Deferred<boolean> = Q.defer<boolean>();
+    let msDeployPath: string = await msDeployUtility.getMSDeployFullPath();
+    let msDeployDirectory: string = msDeployPath.slice(0, msDeployPath.lastIndexOf('\\') + 1);
+    let pathVar: string = process.env.PATH;
     process.env.PATH = msDeployDirectory + ";" + process.env.PATH ;
 
     setParametersFile = utility.copySetParamFileIfItExists(setParametersFile);
-    var setParametersFileName = null;
+    let setParametersFileName: string = null;
     if(setParametersFile != null) {
         setParametersFileName = setParametersFile.slice(setParametersFile.lastIndexOf('\\') + 1, setParametersFile.length);
     }
-    var isParamFilePresentInPackage = isFolderBasedDeployment ? false : await msDeployUtility.containsParamFile(webDeployPkg);
-    var msDeployPath = await msDeployUtility.getMSDeployFullPath();
-    var msDeployCmdArgs = msDeployUtility.getMSDeployCmdArgs(webDeployPkg, webAppName, publishingProfile, removeAdditionalFilesFlag,
+    let isParamFilePresentInPackage: boolean = isFolderBasedDeployment ? false : await msDeployUtility.containsParamFile(webDeployPkg);
+    let msDeployCmdArgs: string = msDeployUtility.getMSDeployCmdArgs(webDeployPkg, webAppName, publishingProfile, removeAdditionalFilesFlag,
         excludeFilesFromAppDataFlag, takeAppOfflineFlag, virtualApplication, setParametersFileName, additionalArguments, isParamFilePresentInPackage, isFolderBasedDeployment, 
         useWebDeploy);
 
-    var errorFile = path.join(tl.getVariable('System.DefaultWorkingDirectory'),"error.txt");
-    //var fd = fs.openSync(errorFile, "w");
-    //var isErrorFileOpen = true;
-    //var errObj = fs.createWriteStream("", {fd: fd} );
-     var errWs = fs.createWriteStream(errorFile);
+    let errorFile: string = path.join(tl.getVariable('System.DefaultWorkingDirectory'),"error.txt");
+    let errWs: fs.WriteStream = fs.createWriteStream(errorFile);
+     
+     errWs.on('finish', () => {
+         msDeployUtility.redirectMSDeployErrorToConsole();
+     });
+
      errWs.on('open', async (fd: number) => {
          try {
              let rc: number = await tl.exec("msdeploy", msDeployCmdArgs, <any>{failOnStdErr: true, errStream: errWs});
@@ -56,44 +57,13 @@ export async function DeployUsingMSDeploy(webDeployPkg, webAppName, publishingPr
              defer.reject(new Error(error.message));
          }
          finally {
-             errWs.close();
-             errWs.on('finish', () => {
-                 msDeployUtility.redirectMSDeployErrorToConsole();
-             });
+             errWs.end();
              process.env.PATH = pathVar;
              if(setParametersFile != null) {
                  tl.rmRF(setParametersFile, true);
              }
          }
      });
-    
-    
-    
-    
-    /*try {
-        await tl.exec("msdeploy", msDeployCmdArgs, <any>{failOnStdErr: true, errStream: errObj})
-        if(publishingProfile != null) {
-            console.log(tl.loc('WebappsuccessfullypublishedatUrl0', publishingProfile.destinationAppUrl));
-        }
-    }
-    catch (error) {
-        tl.error(tl.loc('Failedtodeploywebsite'));
-        fs.fsyncSync(fd);
-        fs.closeSync(fd);
-        isErrorFileOpen = false;
-        msDeployUtility.redirectMSDeployErrorToConsole()
-        throw Error(error);
-    }
-    finally {
-        if(isErrorFileOpen) {
-            fs.fsyncSync(fd);
-            fs.closeSync(fd);
-            isErrorFileOpen = false;
-        }
-        process.env.PATH = pathVar;
-        if(setParametersFile != null) {
-                tl.rmRF(setParametersFile, true);
-        }
-        }*/
-        return <Q.Promise<boolean>>defer.promise;
+
+     return <Q.Promise<boolean>> defer.promise;
 }

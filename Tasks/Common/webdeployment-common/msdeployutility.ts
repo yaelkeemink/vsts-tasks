@@ -99,63 +99,22 @@ export function getMSDeployCmdArgs(webAppPackage: string, webAppName: string, pu
  * @returns boolean
  */
 export async  function containsParamFile(webAppPackage: string ): Promise<boolean> {
-    /*var parameterFile = tl.getVariable('System.DefaultWorkingDirectory') + '\\' + 'parameter.xml';
-    var fd = fs.openSync(parameterFile, "w");
-    var outputObj = fs.createWriteStream("",{"fd": fd});
-    
-    try {
-        var msDeployCheckParamFileCmdArgs = "-verb:getParameters -source:package=\'" + webAppPackage + "\'";
-        await tl.exec("msdeploy", msDeployCheckParamFileCmdArgs, <any>{ failOnStdErr: true, outStream: outputObj });
-    }
-    catch(error) {
-        throw Error(error);
-    }
-    finally {
-        fs.fsyncSync(fd);
-        fs.closeSync(fd);
-    }
-
-    var paramContentXML = fs.readFileSync(parameterFile).toString();
-    paramContentXML = paramContentXML.slice(paramContentXML.indexOf('\n') + 1, paramContentXML.length);
-    var isParamFilePresent = false;
-
-    await parseString(paramContentXML, (error, result) => {
-        if(error) {
-            throw new Error(error);
-        }
-        if(result != null && result['output'] != null && result['output']['parameters'] != null) {
-            if(result['output']['parameters'][0] ) {
-                isParamFilePresent = true;
-            }
-        }
-        else {
-            tl.warning("Unable to parse the content of parameterFile: "+parameterFile);
-            tl.debug("Parameter File Content is:");
-            tl.debug(paramContentXML);
-        }
-
-    });
-
-    tl.debug("Is parameter file present in web package : " + isParamFilePresent);
-    tl.rmRF(parameterFile, true);
-    return isParamFilePresent;*/
     var defer = Q.defer<boolean>();
-    var isParamFilePresentBackup = await isMSDeployPackage(webAppPackage);
-    var parameterFile = path.join(tl.getVariable('System.DefaultWorkingDirectory'), 'parameter.xml');
-    var ws = fs.createWriteStream(parameterFile);
-    ws.on('open', async(fd: number) => {
-        var msDeployCheckParamFileCmdArgs: string = "-verb:getParameters -source:package=\'" + webAppPackage + "\'";
-        try {
-            await tl.exec("msdeploy", msDeployCheckParamFileCmdArgs, <any>{ failOnStdErr: true, outStream: ws });
-        }
-        catch(error) {
-            defer.resolve(isParamFilePresentBackup);
-        }
-        ws.close();
-        ws.on('finish', async () => {
-            var paramContentXML = fs.readFileSync(parameterFile);
+    let isResolved: boolean = false;
+    var isParamFilePresentBackup: boolean = await isMSDeployPackage(webAppPackage);
+    var parameterFile: string = path.join(tl.getVariable('System.DefaultWorkingDirectory'), 'parameter.xml');
+    var ws: fs.WriteStream = fs.createWriteStream(parameterFile);
+
+    ws.on('finish', async () => {
+        let paramContentXML: string = fs.readFileSync(parameterFile).toString();
+        tl.rmRF(parameterFile, true);
+        if(!isResolved) {
+            paramContentXML = paramContentXML.slice(paramContentXML.indexOf('\n') + 1, paramContentXML.length);
             await parseString(paramContentXML, (error, result) => {
                 if(error) {
+                    tl.error("An Error occured during the parsing of the Parameter file XML Content: " + error.message);
+                    tl.debug("Attempted to parse the XML Content: ");
+                    tl.debug(paramContentXML);
                     defer.resolve(isParamFilePresentBackup);
                 }
                 else if(result != null && result['output'] != null && result['output']['parameters'] != null) {
@@ -164,13 +123,28 @@ export async  function containsParamFile(webAppPackage: string ): Promise<boolea
                     }
                 }
                 else {
+                    tl.warning("Parameter File is not well formed");
                     defer.resolve(false);
                 }
             });
-        })
+        }
+    });
+    
+    ws.on('open', async(fd: number) => {
+        var msDeployCheckParamFileCmdArgs: string = "-verb:getParameters -source:package=\'" + webAppPackage + "\'";
+        try {
+            await tl.exec("msdeploy", msDeployCheckParamFileCmdArgs, <any>{ failOnStdErr: true, outStream: ws });
+        }
+        catch(error) {
+            isResolved = true;
+            defer.resolve(isParamFilePresentBackup);
+        }
+        finally {
+            ws.end();
+        }
     });
 
-    return <Q.Promise<boolean>>defer.promise;
+    return <Q.Promise<boolean>> defer.promise;
 }
 
 /**
@@ -182,18 +156,19 @@ async function isMSDeployPackage(webAppPackage: string ) {
     var isParamFilePresent = false;
     let pacakgeComponent;
     try {
-         pacakgeComponent = await zipUtility.getArchivedEntries(webAppPackage);
+        pacakgeComponent = await zipUtility.getArchivedEntries(webAppPackage);
+        
+        if (((pacakgeComponent["entries"].indexOf("parameters.xml") > -1) || (pacakgeComponent["entries"].indexOf("Parameters.xml") > -1)) && 
+            ((pacakgeComponent["entries"].indexOf("systeminfo.xml") > -1) || (pacakgeComponent["entries"].indexOf("systemInfo.xml") > -1))) {
+                isParamFilePresent = true;
+        }
+        
+        tl.debug("Is the package an msdeploy package : " + isParamFilePresent);
+        return isParamFilePresent;
     }
     catch(error) {
         return false;
     }
-
-    if (((pacakgeComponent["entries"].indexOf("parameters.xml") > -1) || (pacakgeComponent["entries"].indexOf("Parameters.xml") > -1)) && 
-    ((pacakgeComponent["entries"].indexOf("systeminfo.xml") > -1) || (pacakgeComponent["entries"].indexOf("systemInfo.xml") > -1))) {
-        isParamFilePresent = true;
-    }
-    tl.debug("Is the package an msdeploy package : " + isParamFilePresent);
-    return isParamFilePresent;
 }
 
 
@@ -284,7 +259,7 @@ export function redirectMSDeployErrorToConsole() {
                 tl.warning(tl.loc("Trytodeploywebappagainwithrenamefileoptionselected"));
             }
             tl.error(errorFileContent.toString());
-            tl.rmRF(msDeployErrorFilePath);
         }
+        tl.rmRF(msDeployErrorFilePath);
     }
 }
