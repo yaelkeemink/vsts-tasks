@@ -345,6 +345,7 @@
         "VideoCollectorNotSupportedWithRunSettings": "Video collector is not supported with run settings.",
         "runTestInIsolationNotSupported": "Running tests in isolation is not supported when using the multi-agent phase setting. This option will be ignored.",
         "tiaNotSupportedInDta": "Running only impacted tests is not supported when using the multi-agent phase setting. This option will be ignored.",
-        "overrideNotSupported": "Overriding test run parameters is supported only with runsettings file. This option will be ignored."
+        "overrideNotSupported": "Overriding test run parameters is supported only with runsettings file. This option will be ignored.",
+        "vsVersion12NotSupported": "Running tests using VSTest version 2013 is not supported when using the multi-agent phase setting."
     }
 }

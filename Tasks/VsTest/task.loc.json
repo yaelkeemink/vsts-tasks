@@ -344,6 +344,7 @@
     "VideoCollectorNotSupportedWithRunSettings": "ms-resource:loc.messages.VideoCollectorNotSupportedWithRunSettings",
     "runTestInIsolationNotSupported": "ms-resource:loc.messages.runTestInIsolationNotSupported",
     "tiaNotSupportedInDta": "ms-resource:loc.messages.tiaNotSupportedInDta",
-    "overrideNotSupported": "ms-resource:loc.messages.overrideNotSupported"
+    "overrideNotSupported": "ms-resource:loc.messages.overrideNotSupported",
+    "vsVersion12NotSupported": "ms-resource:loc.messages.vsVersion12NotSupported"
   }
 }

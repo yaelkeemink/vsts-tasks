@@ -12,6 +12,12 @@ export function getDistributedTestConfigurations(): models.DtaTestConfigurations
     tl.setResourcePath(path.join(__dirname, 'task.json'));
     const dtaConfiguration = {} as models.DtaTestConfigurations;
     initTestConfigurations(dtaConfiguration);
+
+    if(dtaConfiguration.vsTestVersion == "12.0")
+    {        
+        throw (tl.loc('vsVersion12NotSupported'));        
+    }
+
     if(dtaConfiguration.tiaConfig.tiaEnabled) {
         tl.warning(tl.loc('tiaNotSupportedInDta'));
         dtaConfiguration.tiaConfig.tiaEnabled = false;
