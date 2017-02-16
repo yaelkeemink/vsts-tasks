@@ -1,14 +1,27 @@
 import path = require('path');
 import tl = require('vsts-task-lib/task');
+var nutil = require('nuget-task-common/utility');
 
 tl.setResourcePath(path.join(__dirname, 'task.json'));
 
-var gruntFile = tl.getPathInput('gruntFile', true, true);
+var gruntFilePath = tl.getPathInput('gruntFile', true, false);
 var grunt = tl.which('grunt', false);
 var isCodeCoverageEnabled = tl.getBoolInput('enableCodeCoverage');
 var publishJUnitResults = tl.getBoolInput('publishJUnitResults');
 var testResultsFiles = tl.getInput('testResultsFiles', publishJUnitResults);
 var cwd = tl.getPathInput('cwd', true, false);
+var targets = tl.getDelimitedInput('targets', ' ', false);
+var argument = tl.getInput('arguments', false);
+
+try {
+	var gruntFiles = nutil.resolveFilterSpec(gruntFilePath, tl.getVariable("System.DefaultWorkingDirectory"));
+	tl.debug("number of files matching filePath: " + gruntFiles.length);
+}
+catch(error) {
+	tl.warning(error);
+	tl.exit(tl.TaskResult.Succeeded);
+}
+
 tl.mkdirP(cwd);
 tl.cd(cwd);
 
@@ -50,12 +63,17 @@ if (isCodeCoverageEnabled) {
 	var reportDirectory = path.join(cwd, 'coverage/');
 }
 
-// optional - no targets will concat nothing
-gt.arg(tl.getDelimitedInput('targets', ' ', false));
-gt.arg('--gruntfile');
-gt.pathArg(gruntFile);
-gt.argString(tl.getInput('arguments', false));
-gt.exec().then(function (code) {
+var execPromise = [];
+for (var gruntFile of gruntFiles) {
+	// optional - no targets will concat nothing
+	gt.arg(targets);
+	gt.arg('--gruntfile');
+	gt.pathArg(gruntFile);
+	gt.argString(argument);
+	execPromise.push(gt.exec());
+}
+
+Q.all(execPromise).then(function (code) {
 	publishTestResults(publishJUnitResults, testResultsFiles);
 	if (isCodeCoverageEnabled) {
 		npm.exec().then(function () {
@@ -72,7 +90,7 @@ gt.exec().then(function (code) {
 			tl.setResult(tl.TaskResult.Failed, tl.loc('NpmFailed', err.message));
 		})
 	} else {
-		tl.setResult(tl.TaskResult.Succeeded, tl.loc('GruntReturnCode', code));
+		tl.setResult(tl.TaskResult.Succeeded, tl.loc('GruntReturnCode', code[0]));
 	}
 }).fail(function (err) {
 	publishTestResults(publishJUnitResults, testResultsFiles);

@@ -2,15 +2,28 @@
 
 import path = require('path');
 import tl = require('vsts-task-lib/task');
+var nutil = require('nuget-task-common/utility');
 
 tl.setResourcePath(path.join(__dirname, 'task.json'));
 
-var gulpFile = tl.getPathInput('gulpFile', true, true);
+var gulpFilePath = tl.getPathInput('gulpFile', true, false);
 var gulp = tl.which('gulp', false);
 var isCodeCoverageEnabled = tl.getBoolInput('enableCodeCoverage');
 var publishJUnitResults = tl.getBoolInput('publishJUnitResults');
 var testResultsFiles = tl.getInput('testResultsFiles', publishJUnitResults);
 var cwd = tl.getPathInput('cwd', true, false);
+var targets = tl.getDelimitedInput('targets', ' ', false);
+var argument = tl.getInput('arguments', false);
+
+try {
+	var gulpFiles = nutil.resolveFilterSpec(gulpFilePath, tl.getVariable("System.DefaultWorkingDirectory"));
+	tl.debug("number of files matching filePath: " + gulpFiles.length);
+}
+catch(error) {
+	tl.warning(error);
+	tl.exit(tl.TaskResult.Succeeded);
+}
+
 tl.mkdirP(cwd);
 tl.cd(cwd);
 
@@ -52,12 +65,17 @@ if (isCodeCoverageEnabled) {
 	var reportDirectory = path.join(cwd, 'coverage/');
 }
 
-// optional - no targets will concat nothing
-gt.arg(tl.getDelimitedInput('targets', ' ', false));
-gt.arg('--gulpfile');
-gt.pathArg(gulpFile);
-gt.argString(tl.getInput('arguments', false));
-gt.exec().then(function (code) {
+var execPromise = [];
+for (var gulpFile of gulpFiles) {
+	// optional - no targets will concat nothing
+	gt.arg(targets);
+	gt.arg('--gulpfile');
+	gt.pathArg(gulpFile);
+	gt.argString(argument);
+	execPromise.push(gt.exec());
+}
+
+Q.all(execPromise).then(function (code) {
 	publishTestResults(publishJUnitResults, testResultsFiles);
 	if (isCodeCoverageEnabled) {
 		npm.exec().then(function () {
@@ -74,7 +92,7 @@ gt.exec().then(function (code) {
 			tl.setResult(tl.TaskResult.Failed, tl.loc('NpmFailed', err.message));
 		})
 	} else {
-		tl.setResult(tl.TaskResult.Succeeded, tl.loc('GulpReturnCode', code));
+		tl.setResult(tl.TaskResult.Succeeded, tl.loc('GulpReturnCode', code[0]));
 	}
 }).fail(function (err) {
 	publishTestResults(publishJUnitResults, testResultsFiles);
