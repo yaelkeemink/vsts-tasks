@@ -1,8 +1,11 @@
 {
   "loc.friendlyName": "CocoaPods",
   "loc.helpMarkDown": "[Altre informazioni](https://go.microsoft.com/fwlink/?LinkID=613745)",
-  "loc.description": "CocoaPods è l'utilità di gestione dipendenze per progetti Cocoa Swift e Objective-C. Consente di eseguire l'installazione dei pod",
+  "loc.description": "CocoaPods is the dependency manager for Swift and Objective-C Cocoa projects. Runs pod install",
   "loc.instanceNameFormat": "pod install",
   "loc.input.label.cwd": "Directory di lavoro",
-  "loc.input.help.cwd": "Directory di lavoro corrente. Per impostazione predefinita, corrisponde alla directory del repository."
+  "loc.input.help.cwd": "Current working directory. Defaults to the repo directory.",
+  "loc.messages.PodReturnCode": "Pod exited with return code: %d",
+  "loc.messages.PodFailed": "Pod failed with error: %s",
+  "loc.messages.CocoaPodsNotFound": "command pod was not found. Please install Cocoapods on the build machine (https://cocoapods.org)"
 }

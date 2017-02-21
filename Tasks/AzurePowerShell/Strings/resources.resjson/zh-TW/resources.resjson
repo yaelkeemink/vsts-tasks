@@ -1,8 +1,8 @@
 {
   "loc.friendlyName": "Azure PowerShell",
-  "loc.helpMarkDown": "[More Information](https://go.microsoft.com/fwlink/?LinkID=613749)",
+  "loc.helpMarkDown": "[詳細資訊](https://go.microsoft.com/fwlink/?LinkID=613749)",
   "loc.description": "在 Azure 環境中執行 PowerShell 指令碼",
-  "loc.instanceNameFormat": "Azure PowerShell 指令碼: $(ScriptPath)",
+  "loc.instanceNameFormat": "Azure PowerShell script: $(ScriptPath)",
   "loc.input.label.ConnectedServiceNameSelector": "Azure 連接類型",
   "loc.input.label.ConnectedServiceName": "Azure 傳統訂用帳戶",
   "loc.input.help.ConnectedServiceName": "執行 PowerShell 之前要設定的 Azure 傳統訂用帳戶",

@@ -6,15 +6,15 @@
   "loc.group.displayName.jarsignerOptions": "Options Jarsigner",
   "loc.group.displayName.zipalignOptions": "Options Zipalign",
   "loc.input.label.files": "Fichiers APK",
-  "loc.input.help.files": "Chemin relatif de la racine de dépôt des fichiers. Les caractères génériques sont autorisés. Par exemple, '**\\bin\\*.apk' pour tous les fichiers APK du sous-dossier bin.",
+  "loc.input.help.files": "Relative path from repo root of the files(s).  Wildcards can be used.  For example, `**\\bin\\*.apk` for all APK files in bin subfolder.",
   "loc.input.label.jarsign": "Signer le fichier APK",
   "loc.input.label.keystoreFile": "Fichier keystore",
-  "loc.input.help.keystoreFile": "Chemin d'accès complet au fichier keystore.",
+  "loc.input.help.keystoreFile": "Full path to the keystore file.",
   "loc.input.label.keystorePass": "Mot de passe keystore",
   "loc.input.label.keystoreAlias": "Alias",
   "loc.input.label.keyPass": "Mot de passe de la clé",
   "loc.input.label.jarsignerArguments": "Arguments Jarsigner",
   "loc.input.label.zipalign": "Zipalign",
   "loc.input.label.zipalignLocation": "Emplacement de Zipalign",
-  "loc.input.help.zipalignLocation": "Indiquez éventuellement le chemin d'accès à zipalign.exe. Généralement, tout fichier zipalign.exe du dossier SDK Android peut être utilisé."
+  "loc.input.help.zipalignLocation": "Optionally supply the path to zipalign.exe.  It defaults to use any zipalign.exe found in Android SDK folder."
 }

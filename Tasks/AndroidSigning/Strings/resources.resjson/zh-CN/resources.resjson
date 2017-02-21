@@ -6,15 +6,15 @@
   "loc.group.displayName.jarsignerOptions": "Jarsigner 选项",
   "loc.group.displayName.zipalignOptions": "Zipalign 选项",
   "loc.input.label.files": "APK 文件",
-  "loc.input.help.files": "文件存储库根路径的相对路径。可以使用通配符。例如，\"**\\bin\\*.apk\" 表示 bin 子文件夹中的所有 APK 文件。",
+  "loc.input.help.files": "Relative path from repo root of the files(s).  Wildcards can be used.  For example, `**\\bin\\*.apk` for all APK files in bin subfolder.",
   "loc.input.label.jarsign": "为 APK 签名",
   "loc.input.label.keystoreFile": "Keystore 文件",
-  "loc.input.help.keystoreFile": "keystore 文件的完整路径。",
+  "loc.input.help.keystoreFile": "Full path to the keystore file.",
   "loc.input.label.keystorePass": "Keystore 密码",
   "loc.input.label.keystoreAlias": "别名",
   "loc.input.label.keyPass": "密钥密码",
   "loc.input.label.jarsignerArguments": "Jarsigner 参数",
   "loc.input.label.zipalign": "Zipalign",
   "loc.input.label.zipalignLocation": "Zipalign 位置",
-  "loc.input.help.zipalignLocation": "可以选择提供 zipalign.exe 的路径。它默认为使用在 Android SDK 文件夹中找到的任何 zipalign.exe。"
+  "loc.input.help.zipalignLocation": "Optionally supply the path to zipalign.exe.  It defaults to use any zipalign.exe found in Android SDK folder."
 }

@@ -6,15 +6,15 @@
   "loc.group.displayName.jarsignerOptions": "Jarsigner 옵션",
   "loc.group.displayName.zipalignOptions": "Zipalign 옵션",
   "loc.input.label.files": "APK 파일",
-  "loc.input.help.files": "파일의 리포 루트로부터의 상대 경로입니다. 와일드카드를 사용할 수 있습니다. 예를 들어, bin 하위 폴더에 있는 모든 APK 파일을 표시하기 위해 `**\\bin\\*.apk`를 사용할 수 있습니다.",
+  "loc.input.help.files": "Relative path from repo root of the files(s).  Wildcards can be used.  For example, `**\\bin\\*.apk` for all APK files in bin subfolder.",
   "loc.input.label.jarsign": "APK 서명",
   "loc.input.label.keystoreFile": "Keystore 파일",
-  "loc.input.help.keystoreFile": "keystore 파일의 전체 경로입니다.",
+  "loc.input.help.keystoreFile": "Full path to the keystore file.",
   "loc.input.label.keystorePass": "Keystore 암호",
   "loc.input.label.keystoreAlias": "별칭",
   "loc.input.label.keyPass": "키 암호",
   "loc.input.label.jarsignerArguments": "Jarsigner 인수",
   "loc.input.label.zipalign": "Zipalign",
   "loc.input.label.zipalignLocation": "Zipalign 위치",
-  "loc.input.help.zipalignLocation": "원하는 경우 zipalign.exe로의 경로를 제공하세요. 기본적으로 Android SDK 폴더에 있는 zipalign.exe를 사용합니다."
+  "loc.input.help.zipalignLocation": "Optionally supply the path to zipalign.exe.  It defaults to use any zipalign.exe found in Android SDK folder."
 }

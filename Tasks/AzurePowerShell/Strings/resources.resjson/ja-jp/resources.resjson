@@ -1,8 +1,8 @@
 {
   "loc.friendlyName": "Azure PowerShell",
-  "loc.helpMarkDown": "[More Information](https://go.microsoft.com/fwlink/?LinkID=613749)",
+  "loc.helpMarkDown": "[詳細](https://go.microsoft.com/fwlink/?LinkID=613749)",
   "loc.description": "Azure 環境内で PowerShell スクリプトを実行します",
-  "loc.instanceNameFormat": "Azure PowerShell スクリプト: $(ScriptPath)",
+  "loc.instanceNameFormat": "Azure PowerShell script: $(ScriptPath)",
   "loc.input.label.ConnectedServiceNameSelector": "Azure 接続の種類",
   "loc.input.label.ConnectedServiceName": "Azure クラシック サブスクリプション",
   "loc.input.help.ConnectedServiceName": "PowerShell を実行する前に構成する Azure クラシック サブスクリプション",

@@ -1,8 +1,8 @@
 {
   "loc.friendlyName": "Azure PowerShell",
-  "loc.helpMarkDown": "[More Information](https://go.microsoft.com/fwlink/?LinkID=613749)",
+  "loc.helpMarkDown": "[详细信息](https://go.microsoft.com/fwlink/?LinkID=613749)",
   "loc.description": "在 Azure 环境中运行 PowerShell 脚本",
-  "loc.instanceNameFormat": "Azure PowerShell 脚本: $(ScriptPath)",
+  "loc.instanceNameFormat": "Azure PowerShell script: $(ScriptPath)",
   "loc.input.label.ConnectedServiceNameSelector": "Azure 连接类型",
   "loc.input.label.ConnectedServiceName": "Azure 经典订阅",
   "loc.input.help.ConnectedServiceName": "在运行 PowerShell 之前配置的 Azure 经典订阅",
