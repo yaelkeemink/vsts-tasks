@@ -33,6 +33,8 @@ async function run() {
         var JSONFiles = tl.getDelimitedInput('JSONFiles', '\n', false);
         var xmlVariableSubstitution: boolean = tl.getBoolInput('XmlVariableSubstitution', false);
         var endPointAuthCreds = tl.getEndpointAuthorization(connectedServiceName, true);
+        var addWebConfig = tl.getBoolInput('AddWebConfig', false);
+        var webConfigParameters = tl.getInput('WebConfigParameters', false);
 
         var isDeploymentSuccess: boolean = true;
         var tempPackagePath = null;
@@ -68,9 +70,32 @@ async function run() {
         webDeployPkg = availableWebPackages[0];
 
         var isFolderBasedDeployment = utility.isInputPkgIsFolder(webDeployPkg);
+        var generateTempFolder = JSONFiles.length != 0 || xmlTransformation || xmlVariableSubstitution || addWebConfig;
 
+        if(generateTempFolder) {
+            var folderPath = fileTransformationsUtility.generateTemporaryFolder(isFolderBasedDeployment, webDeployPkg);
+        }
+        
         if(JSONFiles.length != 0 || xmlTransformation || xmlVariableSubstitution) {
-            var output = await fileTransformationsUtility.fileTransformations(isFolderBasedDeployment, JSONFiles, xmlTransformation, xmlVariableSubstitution, webDeployPkg);
+            await fileTransformationsUtility.fileTransformations(isFolderBasedDeployment, JSONFiles, xmlTransformation, xmlVariableSubstitution, folderPath);
+        }
+
+        if(addWebConfig) {
+            var webConfigPath = path.join(folderPath, "web.config");
+            var JSONParameters = JSON.parse(webConfigParameters);
+            var iisNodeConfigTemplatePath = path.join(__dirname, 'NodeWebConfigTemplate');
+            var webConfigContent = fs.readFileSync(iisNodeConfigTemplatePath, 'utf8');
+            webConfigContent = webConfigContent.replace(/\{NodeStartFile\}/g, JSONParameters["NodeStartFile"]);
+            webConfigContent = webConfigContent.replace(/\{Module\}/g, JSONParameters["Module"]);
+            var  options: tl.FsOptions = {
+                encoding: "utf8"
+            }
+            tl.writeFile(webConfigPath, webConfigContent, options);
+            console.log('Generated web.config.');
+        }
+
+        if(generateTempFolder) {
+            var output = fileTransformationsUtility.archiveFolder(isFolderBasedDeployment, webDeployPkg, folderPath);
             tempPackagePath = output.tempPackagePath;
             webDeployPkg = output.webDeployPkg;
         }
