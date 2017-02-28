@@ -14,13 +14,20 @@ var testResultsFiles = tl.getInput('testResultsFiles', publishJUnitResults);
 var cwd = tl.getPathInput('cwd', true, false);
 var targets = tl.getDelimitedInput('targets', ' ', false);
 var argument = tl.getInput('arguments', false);
+var cwdGivenFlag = tl.getInput('cwd', true) ? true : false;
 
 executeTask();
 
 function executeTask() {
 	try {
-		var gulpFiles = nutil.resolveFilterSpec(gulpFilePath, tl.getVariable("System.DefaultWorkingDirectory"));
-		tl.debug("number of files matching filePath: " + gulpFiles.length);
+		var gulpFiles = [];
+		if (RegExp("/[*?+@!{}\[\]]/").test(gulpFilePath)) {
+			gulpFiles = tl.findMatch(tl.getVariable("System.DefaultWorkingDirectory"), gulpFilePath);
+			tl.debug("number of files matching filePath: " + gulpFiles.length);
+		}
+		else {
+			gulpFiles = [gulpFilePath];
+		}
 	}
 	catch (error) {
 		tl.warning(error);
@@ -66,44 +73,45 @@ function executeTask() {
 			istanbul.arg('./node_modules/mocha/bin/_mocha');
 		}
 		istanbul.arg(testSrc);
-		var summaryFile = path.join(cwd, 'coverage/cobertura-coverage.xml');
-		var reportDirectory = path.join(cwd, 'coverage/');
 	}
 
-	var execPromise = [];
+	var dirName = cwd;
 	for (var gulpFile of gulpFiles) {
 		// optional - no targets will concat nothing
 		gt.arg(targets);
 		gt.arg('--gulpfile');
 		gt.arg(gulpFile);
 		gt.line(argument);
-		execPromise.push(gt.exec());
-	}
-
-	Q.all(execPromise).then(function (code) {
-		publishTestResults(publishJUnitResults, testResultsFiles);
-		if (isCodeCoverageEnabled) {
-			npm.exec().then(function () {
-				istanbul.exec().then(function (code) {
-					publishCodeCoverage(summaryFile, reportDirectory);
-					tl.setResult(tl.TaskResult.Succeeded, tl.loc('GulpReturnCode', code));
+		gt.exec().then(function (code) {
+			publishTestResults(publishJUnitResults, testResultsFiles);
+			if (isCodeCoverageEnabled) {
+				if(!cwdGivenFlag) {
+					dirName = path.dirname(gulpFile);
+				}
+				var summaryFile = path.join(dirName, 'coverage/cobertura-coverage.xml');
+				var reportDirectory = path.join(dirName, 'coverage/');
+				npm.exec().then(function () {
+					istanbul.exec().then(function (code) {
+						publishCodeCoverage(summaryFile, reportDirectory);
+						tl.setResult(tl.TaskResult.Succeeded, tl.loc('GulpReturnCode', code));
+					}).fail(function (err) {
+						publishCodeCoverage(summaryFile, reportDirectory);
+						tl.debug('taskRunner fail');
+						tl.setResult(tl.TaskResult.Failed, tl.loc('IstanbulFailed', err.message));
+					});
 				}).fail(function (err) {
-					publishCodeCoverage(summaryFile, reportDirectory);
 					tl.debug('taskRunner fail');
-					tl.setResult(tl.TaskResult.Failed, tl.loc('IstanbulFailed', err.message));
-				});
-			}).fail(function (err) {
-				tl.debug('taskRunner fail');
-				tl.setResult(tl.TaskResult.Failed, tl.loc('NpmFailed', err.message));
-			})
-		} else {
-			tl.setResult(tl.TaskResult.Succeeded, tl.loc('GulpReturnCode', code[0]));
-		}
-	}).fail(function (err) {
-		publishTestResults(publishJUnitResults, testResultsFiles);
-		tl.debug('taskRunner fail');
-		tl.setResult(tl.TaskResult.Failed, tl.loc('GulpFailed', err.message));
-	})
+					tl.setResult(tl.TaskResult.Failed, tl.loc('NpmFailed', err.message));
+				})
+			} else {
+				tl.setResult(tl.TaskResult.Succeeded, tl.loc('GulpReturnCode', code[0]));
+			}
+		}).fail(function (err) {
+			publishTestResults(publishJUnitResults, testResultsFiles);
+			tl.debug('taskRunner fail');
+			tl.setResult(tl.TaskResult.Failed, tl.loc('GulpFailed', err.message));
+		})
+	}
 }
 
 function publishTestResults(publishJUnitResults, testResultsFiles: string) {
@@ -119,7 +127,7 @@ function publishTestResults(publishJUnitResults, testResultsFiles: string) {
 			tl.debug('No pattern found in testResultsFiles parameter');
 			var matchingTestResultsFiles = [testResultsFiles];
 		}
-		if (!matchingTestResultsFiles  ||  matchingTestResultsFiles.length  ==  0) {
+		if (!matchingTestResultsFiles || matchingTestResultsFiles.length == 0) {
 			tl.warning('No test result files matching ' + testResultsFiles + ' were found, so publishing JUnit test results is being skipped.');
 			return 0;
 		}
