@@ -1,8 +1,6 @@
 /// <reference path="../../definitions/mocha.d.ts"/>
 /// <reference path="../../definitions/node.d.ts"/>
-/// <reference path="../../definitions/Q.d.ts"/>
 
-import * as Q from 'q';
 import * as assert from 'assert';
 import * as trm from '../../lib/taskRunner';
 import * as psm from '../../lib/psRunner';
@@ -12,9 +10,10 @@ import * as mockHelper from '../../lib/mockHelper';
 import * as fs from 'fs';
 import * as shell from 'shelljs';
 
-const settingsHelper = require('../../../Tasks/VsTest/settingshelper');
 let xml2js = require('../../../Tasks/VsTest/node_modules/xml2js');
 const utils = require( '../../../Tasks/VsTest/helpers');
+const settingsHelper = require('../../../Tasks/VsTest/settingshelper');
+const dt = require('../../../Tasks/VsTest/distributedtest');
 
 //const xml2js = require('xml2js');
 const ps = shell.which('powershell.exe');

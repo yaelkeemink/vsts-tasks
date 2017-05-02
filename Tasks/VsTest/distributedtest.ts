@@ -8,6 +8,7 @@ import * as settingsHelper from './settingshelper';
 import * as utils from './helpers';
 import * as ta from './testagent';
 import * as versionFinder from './versionfinder';
+import * as stream from 'stream';
 
 export class DistributedTest {
     constructor(dtaTestConfig: models.DtaTestConfigurations) {
@@ -17,6 +18,32 @@ export class DistributedTest {
 
     public runDistributedTest() {
         this.registerAndConfigureAgent();
+    }
+
+    public streamProcessLogging(outputStream: stream.Readable, errorStream: stream.Readable) {
+        outputStream.setEncoding('utf8');
+        errorStream.setEncoding('utf8');
+
+        outputStream.on('data', (c) => {
+            // this is bit hacky way to fix the web method logging as it's not configurable currently
+            // and writes info to stdout directly
+            const lines = c.toString().split('\n');
+            // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp
+            lines.filter(s => s.replace(/\s+/g, '').length !== 0).forEach(function (line: string) {
+                if (line.startsWith('Web method')) {
+                    tl.debug(line);
+                } else {
+                    tl._writeLine(line.toString());
+                }
+            });
+        });
+
+        errorStream.on('data', (c) => {
+            const lines = c.toString().split('\n');
+            lines.filter(s => s.replace(/\s+/g, '').length !== 0).forEach(function (line: string) {
+                tl._writeError(line.toString());
+            });
+        });
     }
 
     private async registerAndConfigureAgent() {
@@ -76,26 +103,7 @@ export class DistributedTest {
         this.dtaPid = proc.pid;
         tl.debug('Modules/DTAExecutionHost.exe is executing with the process id : ' + this.dtaPid);
 
-        proc.stdout.setEncoding('utf8');
-        proc.stderr.setEncoding('utf8');
-        proc.stdout.on('data', (c) => {
-            // this is bit hacky way to fix the web method logging as it's not configurable currently
-            // and writes info to stdout directly
-            const lines = c.toString().split('\n');
-            lines.forEach(function (line: string) {
-                if (line.startsWith('Web method')) {
-                    tl.debug(line);
-                } else {
-                    tl._writeLine(line.toString());
-                }
-            });
-        });
-        proc.stderr.on('data', (c) => {
-            const lines = c.toString().split('\n');
-            lines.forEach(function (line: string) {
-               tl._writeError(line.toString());
-            });
-        });
+        this.streamProcessLogging(proc.stdout, proc.stderr);
 
         proc.on('error', (err) => {
             this.dtaPid = -1;
