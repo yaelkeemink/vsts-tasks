@@ -596,7 +596,7 @@ describe('PackerBuild Suite', function() {
             
             assert(tr.succeeded, 'task should have succeeded');
             assert(tr.stderr.length == 0 || tr.errorIssues.length, 'should not have written to stderr');
-            assert(tr.stdout.indexOf("writing to file /tmp/tempdir/100/default.windows.template-builderUpdated.json content: {\"builders\":[{\"type\":\"azure-arm\",\"ssh_pty\":\"true\"}]}") != -1, "additional parameters should be written to updated template file");
+            assert(tr.stdout.indexOf("writing to file /tmp/tempdir/100/default.linux.template-builderUpdated.json content: {\"builders\":[{\"type\":\"azure-arm\",\"ssh_pty\":\"true\"}]}") != -1, "additional parameters should be written to updated template file");
             
             done();
         });
