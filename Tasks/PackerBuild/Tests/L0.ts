@@ -591,10 +591,13 @@ describe('PackerBuild Suite', function() {
             let tp = path.join(__dirname, 'L0LinuxBuiltinTemplateAdditionalParameters.js');
             let tr : ttm.MockTestRunner = new ttm.MockTestRunner(tp);
             tr.run();
-
+            console.log(tr.stdout);
+            console.log(tr.stderr);
+            
+            assert(tr.succeeded, 'task should have succeeded');
             assert(tr.stderr.length == 0 || tr.errorIssues.length, 'should not have written to stderr');
             assert(tr.stdout.indexOf("writing to file /tmp/tempdir/100/default.windows.template-builderUpdated.json content: {\"builders\":[{\"type\":\"azure-arm\",\"ssh_pty\":\"true\"}]}") != -1, "additional parameters should be written to updated template file");
-            assert(tr.succeeded, 'task should have succeeded');
+            
             done();
         });
     }
