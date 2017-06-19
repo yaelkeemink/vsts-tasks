@@ -88,7 +88,8 @@ function Test-RetryableException {
     $AllowedExceptions | ForEach-Object {
         Write-Host "******************allowed exception:" $_
         Write-Host "******************actual exception:" $Exception.GetType()
-        if($_ -and ([type]$_).IsAssignableFrom($Exception.GetType()))
+        Write-Host "******************" (([type]$_).IsAssignableFrom($Exception.GetType()))
+        if($_ -and (([type]$_).IsAssignableFrom($Exception.GetType())))
         {
             return $true;
         }
