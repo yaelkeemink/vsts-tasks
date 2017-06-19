@@ -78,7 +78,7 @@ function Invoke-ActionWithRetries {
 function Test-RetryableException {
     [CmdletBinding()]
     param(
-        [System.Object]
+        [System.Exception]
         $Exception,
 
         [string[]]
