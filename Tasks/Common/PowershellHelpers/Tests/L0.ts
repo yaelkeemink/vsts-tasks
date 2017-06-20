@@ -7,7 +7,7 @@ import assert = require('assert');
 import path = require('path');
 var psm = require('../../../../Tests/lib/psRunner');
 var psr = null;
-process.env["TASK_TEST_TRACE"] = "1";
+//process.env["TASK_TEST_TRACE"] = "1";
 
 describe('PowershellHelpers Suite', function () {
     this.timeout(20000);
@@ -31,7 +31,7 @@ describe('PowershellHelpers Suite', function () {
         it('(Invoke-ActionWithRetries) should try on action failure', (done) => {
             psr.run(path.join(__dirname, 'Invoke-ActionWithRetries.ShouldRetryOnException.ps1'), done);
         })
-        /*it('(Invoke-ActionWithRetries) should honor max retries count parameter', (done) => {
+        it('(Invoke-ActionWithRetries) should honor max retries count parameter', (done) => {
             psr.run(path.join(__dirname, 'Invoke-ActionWithRetries.ShouldHonorMaxRetriesParameter.ps1'), done);
         })
         it('(Invoke-ActionWithRetries) should not retry action if it is successful', (done) => {
@@ -51,6 +51,6 @@ describe('PowershellHelpers Suite', function () {
         })
         it('(Invoke-ActionWithRetries) should handle multiple retryable exceptions', (done) => {
             psr.run(path.join(__dirname, 'Invoke-ActionWithRetries.ShouldHandleMultipleRetryableExceptions.ps1'), done);
-        })*/
+        })
     }
 });
