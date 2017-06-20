@@ -86,7 +86,7 @@ function Test-RetryableException {
     )
 
     $AllowedExceptions | ForEach-Object {
-        Write-Host "******************PS version:" $PSVersionTable
+        $PSVersionTable
         Write-Host "******************allowed exception:" ([type]$_)
         Write-Host "******************actual exception:" $Exception.GetType()
         Write-Host "******************Result:" (([type]$_).IsAssignableFrom($Exception.GetType()))
