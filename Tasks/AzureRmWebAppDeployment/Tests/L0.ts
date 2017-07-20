@@ -8,14 +8,10 @@ import fs = require('fs');
 describe('AzureRmWebAppDeployment Suite', function() {
      before((done) => {
 
-        tl.rmRF(path.join(__dirname, "..", "node_modules","webdeployment-common","Tests", 'L1XdtTransform', 'Web_test.config'), false);
-        tl.rmRF(path.join(__dirname, "..", "node_modules", "webdeployment-common", "Tests", 'L1XmlVarSub', 'Web_test.config'), false);
-        tl.rmRF(path.join(__dirname, "..", "node_modules", "webdeployment-common", "Tests", 'L1XmlVarSub', 'Web_Test.Debug.config'), false);
-        tl.rmRF(path.join(__dirname, "..", "node_modules", "webdeployment-common", "Tests", 'L1XmlVarSub', 'parameters_test.xml'), false);
-        tl.cp(path.join(__dirname, "..", "node_modules", "webdeployment-common", "Tests", 'L1XmlVarSub', 'Web.config'), path.join(__dirname, "..", "node_modules", "webdeployment-common", "Tests", 'L1XmlVarSub', 'Web_test.config'), null, false);
-        tl.cp(path.join(__dirname, "..", "node_modules", "webdeployment-common", "Tests", 'L1XmlVarSub', 'Web.Debug.config'), path.join(__dirname, "..", "node_modules", "webdeployment-common", "Tests", 'L1XmlVarSub', 'Web_test.Debug.config'), null, false);
-        tl.cp(path.join(__dirname, "..", "node_modules", "webdeployment-common", "Tests", 'L1XmlVarSub', 'parameters.xml'), path.join(__dirname, "..", "node_modules", "webdeployment-common", "Tests", 'L1XmlVarSub', 'parameters_test.xml'), null, false);
-        tl.cp(path.join(__dirname, "..", "node_modules","webdeployment-common","Tests", 'L1XdtTransform', 'Web.config'), path.join(__dirname, "..", "node_modules","webdeployment-common","Tests", 'L1XdtTransform', 'Web_test.config'), null, false);
+        tl.cp(path.join(__dirname, "..", "node_modules", "webdeployment-common", "Tests", 'L1XmlVarSub', 'Web.config'), path.join(__dirname, "..", "node_modules", "webdeployment-common", "Tests", 'L1XmlVarSub', 'Web_test.config'), null, true);
+        tl.cp(path.join(__dirname, "..", "node_modules", "webdeployment-common", "Tests", 'L1XmlVarSub', 'Web.Debug.config'), path.join(__dirname, "..", "node_modules", "webdeployment-common", "Tests", 'L1XmlVarSub', 'Web_test.Debug.config'), null, true);
+        tl.cp(path.join(__dirname, "..", "node_modules", "webdeployment-common", "Tests", 'L1XmlVarSub', 'parameters.xml'), path.join(__dirname, "..", "node_modules", "webdeployment-common", "Tests", 'L1XmlVarSub', 'parameters_test.xml'), null, true);
+        tl.cp(path.join(__dirname, "..", "node_modules","webdeployment-common","Tests", 'L1XdtTransform', 'Web.config'), path.join(__dirname, "..", "node_modules","webdeployment-common","Tests", 'L1XdtTransform', 'Web_test.config'), null, true);
         done();
     });
     after(function() {
