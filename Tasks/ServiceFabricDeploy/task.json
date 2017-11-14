@@ -15,8 +15,8 @@
     ],
     "version": {
         "Major": 1,
-        "Minor": 4,
-        "Patch": 4
+        "Minor": 5,
+        "Patch": 0
     },
     "demands": [
         "Cmd"
@@ -393,6 +393,7 @@
         "PublishProfileRequiredAppParams": "An application parameters file or a publish profile must be specified in the VSTS task.",
         "PublishProfileRequiredUpgrade": "Upgrade settings must be overridden or a publish profile must be specified in the VSTS task.",
         "UnsupportedDockerRegistryAuthScheme": "Unsupported authentication scheme '{0}' for Azure container registry.",
+        "UpgradingRegisteredApplication": "Upgrading application since it is already registered.",
         "SFSDK_InvalidSFPackage": "{0} is not a valid Service Fabric application package.",
         "SFSDK_PackageValidationFailed": "Validation failed for package: {0}",
         "SFSDK_UnableToVerifyClusterConnection": "Unable to verify connection to Service Fabric cluster.",

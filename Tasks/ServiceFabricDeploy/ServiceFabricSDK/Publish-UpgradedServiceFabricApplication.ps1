@@ -211,6 +211,7 @@ function Publish-UpgradedServiceFabricApplication
     $reg = Get-ServiceFabricApplicationType -ApplicationTypeName $names.ApplicationTypeName | Where-Object  { $_.ApplicationTypeVersion -eq $names.ApplicationTypeVersion }
     if ($reg)
     {
+        Write-Warning (Get-VstsLocString -Key UpgradingRegisteredApplication)
         $Action = 'Upgrade'
     }
 

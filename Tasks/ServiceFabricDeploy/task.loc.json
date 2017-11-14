@@ -15,8 +15,8 @@
   ],
   "version": {
     "Major": 1,
-    "Minor": 4,
-    "Patch": 4
+    "Minor": 5,
+    "Patch": 0
   },
   "demands": [
     "Cmd"
@@ -393,6 +393,7 @@
     "PublishProfileRequiredAppParams": "ms-resource:loc.messages.PublishProfileRequiredAppParams",
     "PublishProfileRequiredUpgrade": "ms-resource:loc.messages.PublishProfileRequiredUpgrade",
     "UnsupportedDockerRegistryAuthScheme": "ms-resource:loc.messages.UnsupportedDockerRegistryAuthScheme",
+    "UpgradingRegisteredApplication": "ms-resource:loc.messages.UpgradingRegisteredApplication",
     "SFSDK_InvalidSFPackage": "ms-resource:loc.messages.SFSDK_InvalidSFPackage",
     "SFSDK_PackageValidationFailed": "ms-resource:loc.messages.SFSDK_PackageValidationFailed",
     "SFSDK_UnableToVerifyClusterConnection": "ms-resource:loc.messages.SFSDK_UnableToVerifyClusterConnection",
