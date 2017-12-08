@@ -11,8 +11,8 @@
     "author": "Microsoft Corporation",
     "version": {
         "Major": 4,
-        "Minor": 125,
-        "Patch": 1
+        "Minor": 127,
+        "Patch": 0
     },
     "demands": [
         "xcode"
@@ -27,6 +27,11 @@
         {
             "name": "package",
             "displayName": "Package options",
+            "isExpanded": true
+        },
+        {
+            "name": "devices",
+            "displayName": "Devices & simulators",
             "isExpanded": true
         },
         {
@@ -64,16 +69,16 @@
             "name": "xcWorkspacePath",
             "type": "filePath",
             "label": "Workspace or project path",
-            "defaultValue": "**/*.xcodeproj/*.xcworkspace",
+            "defaultValue": "**/*.xcodeproj/project.xcworkspace",
             "required": false,
-            "helpMarkDown": "(Optional) Enter a relative path from the root of the repository to the Xcode workspace or project. For example, `MyApp/MyApp.xcworkspace` or `MyApp/MyApp.xcworkspace/MyApp.xcodeproj`."
+            "helpMarkDown": "(Optional) Enter a relative path from the root of the repository to the Xcode workspace or project. For example, `MyApp/MyApp.xcworkspace` or `MyApp/MyApp.xcodeproj`."
         },
         {
             "name": "scheme",
             "type": "string",
             "label": "Scheme",
             "required": false,
-            "helpMarkDown": "(Optional, unless you specify a **Workspace or project path** above.) Enter the scheme name defined in Xcode. It must be a shared scheme, with its **Shared** checkbox enabled under **Managed Schemes** in Xcode."
+            "helpMarkDown": "(Optional) Enter a scheme name defined in Xcode. It must be a shared scheme, with its <strong>Shared</strong> checkbox enabled under <strong>Managed Schemes</strong> in Xcode. If you specify a <strong>Workspace or project path</strong> above without specifying a scheme, and the workspace has a single shared scheme, it will be automatically used."
         },
         {
             "name": "xcodeVersion",
@@ -183,7 +188,7 @@
             "visibleRule": "packageApp == true"
         },
         {
-            "name": "signStyle",
+            "name": "signingOption",
             "type": "pickList",
             "label": "Signing style",
             "required": false,
@@ -204,16 +209,16 @@
             "required": false,
             "helpMarkDown": "(Optional) Enter a signing identity override with which to sign the build. This may require unlocking the default keychain on the agent machine. If no value is entered, the Xcode project's setting will be used.",
             "groupName": "sign",
-            "visibleRule": "signStyle = manual"
+            "visibleRule": "signingOption = manual"
         },
         {
-            "name": "provProfileUuid",
+            "name": "provisioningProfileUuid",
             "type": "string",
             "label": "Provisioning profile UUID",
             "required": false,
             "helpMarkDown": "(Optional) Enter the UUID of an installed provisioning profile to be used for this build. Use separate build tasks with different schemes or targets to specify separate provisioning profiles by target in a single workspace (iOS, tvOS, watchOS).",
             "groupName": "sign",
-            "visibleRule": "signStyle = manual"
+            "visibleRule": "signingOption = manual"
         },
         {
             "name": "teamId",
@@ -223,7 +228,66 @@
             "required": false,
             "helpMarkDown": "(Optional, unless you are a member of multiple development teams.) Specify the 10-character development team ID.",
             "groupName": "sign",
-            "visibleRule": "signStyle = auto"
+            "visibleRule": "signingOption = auto"
+        },
+        {
+            "name": "destinationPlatformOption",
+            "type": "picklist",
+            "label": "Destination platform",
+            "defaultValue": "default",
+            "required": false,
+            "helpMarkDown": "Select the destination device's platform to be used for UI testing when the generic build device isn't valid. Choose `Custom` to specify a platform not included in this list. When `Default` is selected, no simulators nor devices will be targeted.",
+            "groupName": "devices",
+            "options": {
+                "default": "Default",
+                "iOS": "iOS and watchOS",
+                "tvOS": "tvOS",
+                "macOS": "macOS",
+                "custom": "Custom"
+            }
+        },
+        {
+            "name": "destinationPlatform",
+            "type": "string",
+            "label": "Custom destination platform",
+            "required": false,
+            "helpMarkDown": "Enter a destination device's platform to be used for UI testing when the generic build device isn't valid.",
+            "groupName": "devices",
+            "visibleRule": "destinationPlatformOption == custom"
+        },
+        {
+            "name": "destinationTypeOption",
+            "type": "radio",
+            "label": "Destination type",
+            "defaultValue": "simulators",
+            "required": false,
+            "helpMarkDown": "Choose the destination type to be used for UI testing. Devices must be connected to the Mac performing the build via a cable or network connection. See <strong>Devices and Simulators</strong> in Xcode.",
+            "groupName": "devices",
+            "visibleRule": "destinationPlatformOption != default && destinationPlatformOption != macOS",
+            "options": {
+                "simulators": "Simulator",
+                "devices": "Connected Device"
+            }
+        },
+        {
+            "name": "destinationSimulators",
+            "label": "Simulator",
+            "type": "string",
+            "defaultValue": "iPhone 7",
+            "required": false,
+            "groupName": "devices",
+            "helpMarkDown": "Enter an Xcode simulator name to be used for UI testing. For example, enter `iPhone X` (iOS and watchOS) or `Apple TV 4K` (tvOS). A target OS version is optional and can be specified in the format 'OS=<i>versionNumber</i>', such as `iPhone X,OS=11.1`. A list of simulators installed on the <strong>Hosted macOS Preview</strong> agent can be [found here](https://docs.microsoft.com/en-us/mobile-center/build/software).",
+            "visibleRule": "destinationPlatformOption != default && destinationPlatformOption != macOS && destinationTypeOption == simulators"
+        },
+        {
+            "name": "destinationDevices",
+            "label": "Device",
+            "type": "string",
+            "defaultValue": "",
+            "required": false,
+            "groupName": "devices",
+            "helpMarkDown": "Enter the name of the device to be used for UI testing, such as `Raisa's iPad`.",
+            "visibleRule": "destinationPlatformOption != default && destinationPlatformOption != macOS && destinationTypeOption == devices"
         },
         {
             "name": "args",
@@ -246,9 +310,8 @@
             "name": "outputPattern",
             "type": "string",
             "label": "Output directory",
-            "defaultValue": "output/$(SDK)/$(Configuration)",
-            "required": true,
-            "helpMarkDown": "Enter a path relative to the working directory where build output (binaries) will be placed. The default value includes variables. When are used, make sure to specify values on the **Variables** tab.",
+            "required": false,
+            "helpMarkDown": "(Optional) Enter a path relative to the working directory where build output (binaries) will be placed. Examples: `output/$(SDK)/$(Configuration)` or `output/$(TestSDK)/$(TestConfiguration)`. Archive and export paths are configured separately.",
             "groupName": "advanced"
         },
         {
@@ -301,6 +364,11 @@
         "FailedToGenerateExportOptionsPlist": "Failed to automatically generate an `Export options` plist file to export an IPA. Please specify an `Export options` plist file in `Package options`.",
         "LocateXcodeBasedOnVersion": "Locating the developer path for Xcode `%s`",
         "FailedToLocateSpecifiedXcode": "Unable to resolve the developer path for Xcode `%s`. Set the `%s` environment variable on the agent machine, or set `Xcode version` to `Default` or `Specify path`.",
-        "CantDetermineProvisioningStyle": "The provisioning style was not found in a pbxProject file. Automatic signing will be used. If the project uses manual signing, auto-export may fail. As a workaround, `Export options` can be set to `Plist` or `Specify`."
+        "CantDetermineProvisioningStyle": "The provisioning style was not found in a pbxProject file. Automatic signing will be used. If the project uses manual signing, auto-export may fail. As a workaround, `Export options` can be set to `Plist` or `Specify`.",
+        "MultipleSchemesFound": "The workspace contains multiple schemes. No scheme selected. Use `Scheme` to specify a target scheme.",
+        "NoSchemeFound": "No shared scheme found in the workspace. Use \"Manage Schemes\" in Xcode to share a scheme.",
+        "SchemeSelected": "The workspace contains a single shared scheme. '%s' will be used.",
+        "FailedToFindScheme": "Failed to find a scheme in the workspace. Use `Scheme` to specify a target scheme.",
+        "OutputDirectoryIgnored": "Output directory for build output (binaries) ignored. Specifying an output directory is incompatible with the '%s' action."
     }
 }
