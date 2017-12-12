@@ -4,6 +4,15 @@ param()
 Trace-VstsEnteringInvocation $MyInvocation
 
 # Get inputs for the task
+$ErrorActionPreference = Get-VstsInput -Name 'errorActionPreference' -Default 'Stop'
+switch ($ErrorActionPreference.ToUpperInvariant()) {
+    'STOP' { }
+    'CONTINUE' { }
+    'SILENTLYCONTINUE' { }
+    default {
+        Write-Error (Get-VstsLocString -Key 'PS_InvalidErrorActionPreference' -ArgumentList $ErrorActionPreference)
+    }
+}
 $environmentName = Get-VstsInput -Name EnvironmentName -Require
 $adminUserName = Get-VstsInput -Name AdminUserName -Require
 $adminPassword = Get-VstsInput -Name AdminPassword -Require
@@ -53,7 +62,6 @@ try
 
     $doSkipCACheckOption = '-SkipCACheck'
     $doNotSkipCACheckOption = ''
-    $ErrorActionPreference = 'Stop'
     $deploymentOperation = 'Deployment'
 
     $envOperationStatus = "Passed"
